@@ -26,6 +26,7 @@
     document.head.appendChild(f2); document.documentElement.classList.add('pt-fade'); }
 }catch(e){}})();
 </script>
+<script>addEventListener("pageswap",function(e){if(e.viewTransition&&sessionStorage.getItem("ptColor"))e.viewTransition.skipTransition()});addEventListener("pagereveal",function(e){if(e.viewTransition&&/pt-(fade|cover)/.test(document.documentElement.className))e.viewTransition.skipTransition()})</script>
 </head>
 <body>
 <header class="pill">

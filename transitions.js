@@ -117,7 +117,7 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
     let u;
     try { u = new URL(a.getAttribute('href'), document.baseURI); } catch { return; }
     if (u.origin !== location.origin || NP(u.pathname) === NP(location.pathname)) return;
-    const color = ({})[NP(u.pathname)];
+    const color = NAV_COLORS[NP(u.pathname)];
     if (!color || scrollY > innerHeight) return;            // far down the page: navigate plainly
 
     e.preventDefault();
@@ -130,7 +130,7 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
         for (let n = world.nextElementSibling; n; n = n.nextElementSibling) parts.push(...(n.classList.contains('sheet') ? n.children : [n]));
         parts.forEach(el => { el.style.transition = 'opacity .35s ease'; el.style.opacity = '0'; });
         // the homepage has no panel at the top, so ours slides away down the screen instead of popping out
-        const home = !({})[NP(u.pathname)] || NP(u.pathname) === '/' || NP(u.pathname) === '/c.html';
+        const home = !NAV_COLORS[NP(u.pathname)] || NP(u.pathname) === '/' || NP(u.pathname) === '/c.html';
         const sheet = document.querySelector('.sheet');
         if (home && sheet) {
           // paint the page behind it the same colour so no light strip shows as it leaves

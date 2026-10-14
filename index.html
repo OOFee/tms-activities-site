@@ -249,6 +249,7 @@
     .join { padding: 8px 14px; font-size: 13px; }
   }
 </style>
+<script>addEventListener("pageswap",function(e){if(e.viewTransition&&sessionStorage.getItem("ptColor"))e.viewTransition.skipTransition()});addEventListener("pagereveal",function(e){if(e.viewTransition&&/pt-(fade|cover)/.test(document.documentElement.className))e.viewTransition.skipTransition()})</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
