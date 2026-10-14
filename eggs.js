@@ -8,10 +8,11 @@
 
   const css = `
     .world .scenery .poppable { pointer-events: all; cursor: pointer; }
-    .egg-title { cursor: pointer; text-decoration: underline wavy rgba(245,243,236,0); text-decoration-thickness: 2px; text-underline-offset: .12em; transition: text-decoration-color .25s; }
-    .egg-title:hover { text-decoration-color: rgba(245,243,236,.6); }
+    .egg-word { display: inline-block; }
+    .egg-title, .egg-word { cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; text-decoration: underline wavy rgba(245,243,236,0); text-decoration-thickness: 2px; text-underline-offset: .12em; transition: text-decoration-color .25s; }
+    .egg-title:hover, .egg-word:hover { text-decoration-color: rgba(245,243,236,.6); }
     .egg-title { display: inline-block; transform-origin: 30% 70%; }
-    .egg-title:hover { animation: eggWig .55s ease-in-out; }
+    .egg-title:hover, .egg-word:hover { animation: eggWig .55s ease-in-out; }
     @keyframes eggWig { 25% { transform: rotate(-2.5deg) translateY(-2px); } 60% { transform: rotate(2deg); } 100% { transform: none; } }
     .egg-ball { position: absolute; z-index: 3; left: 0; top: 0; cursor: grab; touch-action: none; will-change: transform; }
     .egg-ball svg { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -148,8 +149,9 @@
 
   // title toys ------------------------------------------------------------------------------------------------
   const title = document.querySelector('.world-copy h1');
-  if (!title || reduce || !['soccer', 'tennis', 'spanish'].includes(page)) return;
-  title.classList.add('egg-title');
+  if (!title || reduce || !['soccer', 'tennis', 'spanish', 'swimming', 'parties'].includes(page)) return;
+  if (page !== 'parties') title.classList.add('egg-title');
+  title.addEventListener('mousedown', e => { if (e.detail > 1) e.preventDefault(); });
   let sky;
   const skyLayer = () => { if (!sky) { sky = document.createElement('div'); sky.className = 'egg-sky'; document.body.append(sky); } return sky; };
 
@@ -227,7 +229,7 @@
       el.addEventListener('pointerup', release); el.addEventListener('pointercancel', release);
       if (!raf) raf = requestAnimationFrame(tick);
     };
-    title.addEventListener('click', () => { if (getSelection().isCollapsed) spawn(); });
+    title.addEventListener('click', spawn);
   }
 
   // tennis: each click sends a ball flying across the screen; click faster and more come
@@ -252,10 +254,76 @@
       a.onfinish = () => el.remove();
     };
     title.addEventListener('click', () => {
-      if (!getSelection().isCollapsed) return;
       const now = performance.now(); clicks = clicks.filter(t => now - t < 1200); clicks.push(now);
       const n = Math.min(6, 1 + Math.floor((clicks.length - 1) / 1.5));
       for (let i = 0; i < n; i++) ball(i * 90);
+    });
+  }
+
+  // swimming: every click sends up another wave of bubbles (poppable too)
+  if (page === 'swimming' && scenery) {
+    const root = scenery.querySelector('g[filter]') || scenery, live = [];
+    let last = 0, raf = 0;
+    const tick = (now) => {
+      const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
+      const top = scenery.viewBox.baseVal.y - 30;
+      for (let i = live.length - 1; i >= 0; i--) {
+        const b = live[i]; b.t += dt; b.y -= b.v * dt;
+        b.el.setAttribute('cx', (b.x + Math.sin(b.t * b.f) * b.w).toFixed(1)); b.el.setAttribute('cy', b.y.toFixed(1));
+        if (b.y < top || !b.el.isConnected) { b.el.remove(); live.splice(i, 1); }
+      }
+      raf = live.length ? requestAnimationFrame(tick) : 0;
+    };
+    const bubble = () => {
+      if (live.length > 160) return;
+      const vb = scenery.viewBox.baseVal, el = document.createElementNS(NS, 'circle'), r = 5 + Math.random() * 11;
+      el.setAttribute('class', 'k poppable'); el.style.strokeWidth = 2; el.setAttribute('r', r.toFixed(1));
+      const b = { el, x: vb.x + Math.random() * vb.width, y: vb.y + vb.height + 20, v: 110 + Math.random() * 140, t: Math.random() * 6, f: 2 + Math.random() * 2, w: 6 + Math.random() * 10 };
+      el.addEventListener('pointerdown', e => {
+        const rc = el.getBoundingClientRect(); pop('bubble'); burst(scenery, rc.left + rc.width / 2, rc.top + rc.height / 2, Math.max(10, rc.width * .7));
+        el.remove(); e.stopPropagation();
+      });
+      root.append(el); live.push(b);
+      if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
+    };
+    title.addEventListener('click', () => { for (let i = 0; i < 16; i++) setTimeout(bubble, i * 70 + Math.random() * 500); });
+  }
+
+  // parties: clicking "Birthday" fires confetti out across the hero
+  if (page === 'parties') {
+    const world = document.querySelector('.world'), cv = document.createElement('canvas'), cx = cv.getContext('2d'), bits = [];
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none';
+    world.append(cv);
+    const COLS = ['#F1BF00', '#F5F3EC', '#E85D75', '#5EC2E8', '#8BD17C', '#FF9F43'];
+    let raf = 0, last = 0;
+    const tick = (now) => {
+      const dt = Math.min(.033, (now - (last || now)) / 1000); last = now;
+      const dpr = devicePixelRatio || 1, W = world.clientWidth, H = world.clientHeight;
+      if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = W * dpr; cv.height = H * dpr; }
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+      for (let i = bits.length - 1; i >= 0; i--) {
+        const b = bits[i];
+        b.vy += 900 * dt; b.vx *= Math.pow(.35, dt); b.vy *= Math.pow(.55, dt);   // air drag, so they float down
+        b.x += (b.vx + Math.sin(b.t * b.sw) * 40) * dt; b.y += b.vy * dt; b.t += dt; b.a += b.va * dt;
+        if (b.y > H + 20 || b.t > 7) { bits.splice(i, 1); continue; }
+        cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.scale(1, Math.cos(b.t * b.fl));   // flips as it tumbles
+        cx.globalAlpha = Math.min(1, (7 - b.t) * 2); cx.fillStyle = b.c;
+        if (b.round) { cx.beginPath(); cx.arc(0, 0, b.s * .45, 0, Math.PI * 2); cx.fill(); } else cx.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2);
+        cx.restore();
+      }
+      raf = bits.length ? requestAnimationFrame(tick) : (cx.clearRect(0, 0, W, H), 0);
+    };
+    title.addEventListener('mousedown', e => { if (e.target.closest('.egg-word')) e.preventDefault(); });
+    title.addEventListener('click', e => {
+      const w = e.target.closest('.egg-word'); if (!w) return;
+      const r = w.getBoundingClientRect(), wr = world.getBoundingClientRect(), ox = r.left + r.width / 2 - wr.left, oy = r.top + r.height / 2 - wr.top;
+      for (let i = 0; i < 140 && bits.length < 600; i++) {
+        const ang = -Math.PI / 2 + (Math.random() - .35) * 2.2, sp = 700 + Math.random() * 1100;   // a fan up and out, leaning right into the hero
+        bits.push({ x: ox + (Math.random() - .5) * r.width * .6, y: oy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, t: Math.random() * .3,
+          a: Math.random() * 6, va: (Math.random() - .5) * 14, fl: 4 + Math.random() * 8, sw: 2 + Math.random() * 3,
+          s: 7 + Math.random() * 7, c: COLS[i % COLS.length], round: Math.random() < .2 });
+      }
+      if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
     });
   }
 
@@ -281,6 +349,6 @@
       ], { duration: dur, delay, easing: 'linear', fill: 'both' });
       a.onfinish = () => { el.remove(); live--; };
     };
-    title.addEventListener('click', () => { if (getSelection().isCollapsed) for (let i = 0; i < 45; i++) flag(i * 55 + Math.random() * 400); });
+    title.addEventListener('click', () => { for (let i = 0; i < 45; i++) flag(i * 55 + Math.random() * 400); });
   }
 })();

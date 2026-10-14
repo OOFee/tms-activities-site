@@ -1,5 +1,9 @@
 /* Japanese and Spanish text for lang.js, keyed by the English HTML of each block. */
 window.TMS_T = {
+ "<span class=\"egg-word\">Birthday</span> parties": [
+  "<span class=\"egg-word\">誕生日</span>パーティー",
+  "Fiestas de <span class=\"egg-word\">cumpleaños</span>"
+ ],
  "Soccer": [
   "サッカー",
   "Fútbol"
