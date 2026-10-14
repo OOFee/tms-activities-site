@@ -277,3 +277,5 @@ footer.site .wrap { padding-top: 0; padding-bottom: 0; }
   .cardgrid, .cardgrid.two { gap: 16px; }
   .specials { grid-template-columns: 1fr; }
 }
+
+@view-transition { navigation: auto; }
