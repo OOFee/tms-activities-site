@@ -278,4 +278,53 @@ footer.site .wrap { padding-top: 0; padding-bottom: 0; }
   .specials { grid-template-columns: 1fr; }
 }
 
+/* language picker (built by lang.js) */
+.langpick { position: relative; flex: none; }
+.langpick > button { display: flex; align-items: center; gap: 6px; font: 600 13px "Figtree", sans-serif; color: #1C2420; background: rgba(20,25,22,.08); border: 0; border-radius: 999px; padding: 6px 10px 6px 7px; cursor: pointer; }
+.langpick > button:hover { background: rgba(20,25,22,.14); }
+.langpick > button::after { content: "▾"; font-size: 9px; opacity: .6; }
+.langpick .flag { display: block; width: 22px; height: 22px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px rgba(20,25,22,.15); flex: none; }
+.langpick .flag svg { width: 33px; height: 22px; margin-left: -5.5px; display: block; }
+.langpick ul { list-style: none; position: absolute; top: calc(100% + 10px); right: 0; margin: 0; padding: 7px; min-width: 160px; display: none;
+  background: rgba(250,249,245,.95); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(20,25,22,.1); border-radius: 14px; box-shadow: 0 14px 34px rgba(0,0,0,.22); }
+.langpick.open ul { display: block; }
+.langpick li button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; border: 0; border-radius: 9px; background: none; font: 500 14.5px "Figtree", sans-serif; color: #1C2420; cursor: pointer; text-align: left; }
+.langpick li button:hover { background: rgba(20,25,22,.08); }
+.langpick li button[aria-current="true"] { font-weight: 700; }
+.langpick li button[aria-current="true"]::after { content: "✓"; margin-left: auto; color: var(--grass, #2E6B3F); }
+@media (max-width: 980px) { .langpick > button .code { display: none; } .langpick > button { padding: 6px 8px 6px 6px; } }
+html[lang="ja"] body { font-family: "Figtree", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif; }
+
+/* social: footer row + buttons pinned bottom-right */
+.fsocial { display: flex; gap: 10px; margin-top: 16px; }
+.fgrid .fsocial a { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(245,243,236,.22); color: #e9e6db !important; padding: 0 !important; }
+.fgrid .fsocial a:hover { border-color: var(--flood); color: var(--flood) !important; }
+.fsocial svg { width: 19px; height: 19px; }
+.socialpin { position: fixed; right: 18px; bottom: 18px; z-index: 55; display: flex; flex-direction: column; gap: 10px; }
+.socialpin a { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: #fff; box-shadow: 0 8px 22px rgba(0,0,0,.28); transition: transform .18s ease; }
+.socialpin a:hover { transform: translateY(-2px) scale(1.05); }
+.socialpin svg { width: 24px; height: 24px; }
+.socialpin .ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.socialpin .wa { background: #25D366; }
+@media (max-width: 560px) { .socialpin { right: 12px; bottom: 12px; gap: 8px; } .socialpin a { width: 42px; height: 42px; } .socialpin svg { width: 21px; height: 21px; } }
+@media print { .socialpin { display: none; } }
+
+/* phones: one compact pill on every page (home included), room for the language flag */
+@media (max-width: 980px) {
+  header.pill, body > header { gap: 8px; padding: 5px 6px 5px 16px; min-height: 48px; }
+  header.pill .word, body > header .word { font-size: 16.5px; }
+  header.pill .join, body > header .join { padding: 8px 14px; font-size: 13px; }
+  .langpick > button { padding: 3px; background: none; }
+  .langpick > button::after { display: none; }
+  .langpick .flag { width: 26px; height: 26px; }
+  .langpick .flag svg { width: 39px; height: 26px; margin-left: -6.5px; }
+}
+@media (max-width: 400px) {
+  header.pill, body > header { gap: 6px; padding-left: 13px; }
+  header.pill .word, body > header .word { font-size: 15px; }
+  header.pill .join, body > header .join { padding: 7px 11px; font-size: 12.5px; }
+  .navtoggle { padding: 8px 12px; font-size: 13px; }
+}
+
 @view-transition { navigation: auto; }
