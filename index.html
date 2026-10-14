@@ -44,7 +44,7 @@
   .playword:hover { text-decoration-color: rgba(245,243,236,.6); }
   .playword:hover { animation: pwig .55s ease-in-out; }
   @keyframes pwig { 25% { transform: rotate(-4deg) translateY(-2px); } 60% { transform: rotate(3deg); } 100% { transform: none; } }
-  .playword.hint { animation: pwig .55s ease-in-out 2, pline 1.6s ease; }   /* once after load: "I'm clickable" */
+  .playword.hint { animation: pwig .55s ease-in-out, pline 1.6s ease; }   /* once after load: "I'm clickable" */
   @keyframes pline { 0%, 100% { text-decoration-color: rgba(245,243,236,0); } 20%, 70% { text-decoration-color: rgba(245,243,236,.7); } }
   @media (prefers-reduced-motion: reduce) { .playword:hover, .playword.hint { animation: none; } }
   .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background:
@@ -624,7 +624,7 @@
   /* hero chalk, after the intro: nudge a ball or the shuttle and it rolls / bounces / flies away; hold-click to drag and throw */
   (() => {
     const svg = document.querySelector('.heroChalk'), hero = document.querySelector('.hero');
-    if (!svg || !hero || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover)').matches) return;
+    if (!svg || !hero || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const t0 = performance.now(), FLOOR = 840;
     const strip = (g) => g.querySelectorAll(':scope > set, :scope > animateMotion, :scope > g > animateTransform').forEach(a => a.remove());
     const shuttlePath = document.getElementById('hShuttle'), sp = shuttlePath.getTotalLength();
@@ -636,8 +636,16 @@
       { kind: 'football', el: document.querySelector('.heroChalk .roll'), ready: 3.25, r: 54, x: 300, y: 770, vx: 0, vy: 0, rot: 0,
         lines: document.querySelector('.heroChalk .rollx'), speed: document.querySelector('.heroChalk .speed') },
     ];
+    const wrapOf = (o) => { const w = o.el.closest('.hcS, .hcT, .hcF'); return w && getComputedStyle(w).transform !== 'none' ? w : null; };
+    const local = (o, p) => {   // a board point in the object's own frame (only differs on phones, before it's in play)
+      const w = !o.live && wrapOf(o); if (!w) return p;
+      return p.matrixTransform(svg.getScreenCTM().inverse().multiply(w.getScreenCTM()).inverse());
+    };
     const take = (o) => {
       if (o.live) return; o.live = true;
+      const w = wrapOf(o);
+      if (w) { const m = svg.getScreenCTM().inverse().multiply(w.getScreenCTM()), q = new DOMPoint(o.x, o.y).matrixTransform(m);
+        o.k = Math.hypot(m.a, m.b); o.x = q.x; o.y = q.y; o.r *= o.k; w.style.transform = 'none'; }
       if (o.kind === 'football') { [o.el, o.lines, o.speed].forEach(e => e.style.animation = 'none'); }
       else { strip(o.el); o.el.setAttribute('opacity', '1'); }
       // once it's in play, its intro chalk lines rub out
@@ -645,28 +653,35 @@
       trail.animate([{ opacity: getComputedStyle(trail).opacity }, { opacity: 0 }], { duration: 500, easing: 'ease-out', fill: 'forwards' });
     };
     const draw = (o) => {
-      if (o.kind === 'shuttle') o.el.setAttribute('transform', `translate(${o.x.toFixed(1)} ${o.y.toFixed(1)}) rotate(${(o.a * 57.3).toFixed(1)})`);
-      if (o.kind === 'tennis') { o.el.setAttribute('transform', `translate(${o.x.toFixed(1)} ${o.y.toFixed(1)})`); o.el.querySelector('.spin').setAttribute('transform', `rotate(${(o.rot * 57.3).toFixed(1)})`); }
+      const k = o.k || 1;
+      if (o.kind === 'shuttle') o.el.setAttribute('transform', `translate(${o.x.toFixed(1)} ${o.y.toFixed(1)}) rotate(${(o.a * 57.3).toFixed(1)}) scale(${k})`);
+      if (o.kind === 'tennis') { o.el.setAttribute('transform', `translate(${o.x.toFixed(1)} ${o.y.toFixed(1)}) scale(${k})`); o.el.querySelector('.spin').setAttribute('transform', `rotate(${(o.rot * 57.3).toFixed(1)})`); }
       if (o.kind === 'football') {
-        o.el.style.transform = `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) rotate(${(o.rot * 57.3).toFixed(1)}deg) scale(1.6)`;
+        o.el.style.transform = `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) rotate(${(o.rot * 57.3).toFixed(1)}deg) scale(${1.6 * k})`;
         const dir = o.vx < 0 ? -1 : 1;
         if (Math.abs(o.vx) > 1) o.dir = dir;
-        o.lines.style.transform = `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) scale(${o.dir || 1}, 1)`;
+        o.lines.style.transform = `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) scale(${(o.dir || 1) * k}, ${k})`;
         o.speed.style.transform = `scaleX(${Math.min(1.5, .3 + Math.abs(o.vx) / 500).toFixed(2)})`;
       }
     };
     const toView = (e) => { const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return p; };
     const bounds = () => { const r = hero.getBoundingClientRect(), m = svg.getScreenCTM().inverse();
       return { l: new DOMPoint(r.left, 0).matrixTransform(m).x, r: new DOMPoint(r.right, 0).matrixTransform(m).x, t: new DOMPoint(0, Math.max(r.top, 0)).matrixTransform(m).y }; };
+    // the ground is the hero floor, or the top of the panel sliding up over the hero, whichever is higher
+    const panel = document.querySelector('.games');
+    const ground = () => { const t = panel ? panel.getBoundingClientRect().top : Infinity;
+      return isFinite(t) ? Math.min(FLOOR, new DOMPoint(0, t).matrixTransform(svg.getScreenCTM().inverse()).y) : FLOOR; };
 
     let raf = 0, last = 0, prevPt = null, prevT = 0, held = null, grab = null;
     const step = (now) => {
       const dt = Math.min(.033, (now - last) / 1000); last = now;
-      const b = bounds(); let moving = false;
+      const b = bounds(), G = ground(); let moving = false;
       for (const o of objs) {
         if (!o.live || o.rest || o === held) continue;
         if (o.kind === 'football') {
-          const fy = 770, grounded = o.y >= fy && !o.vy;
+          const fy = Math.min(FLOOR, G) - 70 * (o.k || 1);
+          if (o.y > fy) { o.y = fy; o.vy = Math.min(o.vy, 0); }   // the panel lifts it
+          const grounded = o.y >= fy && !o.vy;
           if (!grounded) { o.vy += 1800 * dt; o.y += o.vy * dt; if (o.y > fy) { o.y = fy; o.vy = -o.vy * .45; if (Math.abs(o.vy) < 90) o.vy = 0; } }
           if (o.y >= fy && !o.vy) { const f = 520 * dt; o.vx = Math.abs(o.vx) <= f ? 0 : o.vx - Math.sign(o.vx) * f; }
           o.x += o.vx * dt; o.rot += o.vx * dt / o.r;
@@ -676,7 +691,7 @@
           if (!o.vx && !o.vy && o.y >= fy) o.rest = true;
         } else if (o.kind === 'tennis') {
           o.vy += 1800 * dt; o.x += o.vx * dt; o.y += o.vy * dt; o.rot += o.vx * dt / o.r;
-          const fy = FLOOR - o.r;
+          const fy = G - o.r;
           if (o.y > fy) { o.y = fy; o.vy = -o.vy * (o.bounce || .72); o.vx *= .9; if (Math.abs(o.vy) < 60) o.vy = 0; }
           if (o.y >= fy && !o.vy) { o.vx *= Math.exp(-2.5 * dt); if (Math.abs(o.vx) < 4) o.rest = true; }
           if (o.x < b.l + o.r) { o.x = b.l + o.r; o.vx = Math.abs(o.vx) * .7; }
@@ -691,13 +706,13 @@
           if (o.x < b.l + 14) { o.x = b.l + 14; o.vx = Math.abs(o.vx) * .4; }
           if (o.x > b.r - 14) { o.x = b.r - 14; o.vx = -Math.abs(o.vx) * .4; }
           if (o.y < b.t + 14) { o.y = b.t + 14; o.vy = Math.abs(o.vy) * .4; }
-          if (o.y > FLOOR - 12) { o.y = FLOOR - 12; o.vx = 0; o.vy = 0; o.rest = true; }
+          if (o.y > G - 12) { o.y = G - 12; o.vx = 0; o.vy = 0; o.rest = true; }
         }
         draw(o); if (!o.rest) moving = true;
       }
       raf = moving || held ? requestAnimationFrame(step) : 0;
     };
-    const hitAt = (p, t) => objs.find(o => t >= o.ready && Math.hypot(o.x - p.x, o.y - p.y) <= o.r + 16);
+    const hitAt = (p, t) => objs.find(o => { if (t < o.ready) return false; const q = local(o, p); return Math.hypot(o.x - q.x, o.y - q.y) <= o.r + 16; });
     const kick = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); } };
     // hold-click to pick one up and drag it; let go to throw it with the drag's speed
     hero.addEventListener('pointerdown', (e) => {
@@ -706,11 +721,15 @@
       if (!o) return;
       e.preventDefault(); hero.setPointerCapture(e.pointerId);
       take(o); held = o; o.rest = false; o.vx = o.vy = 0;
-      grab = { dx: o.x - p.x, dy: o.y - p.y, px: p.x, py: p.y, pt: performance.now() };
+      grab = { dx: o.x - p.x, dy: o.y - p.y, px: p.x, py: p.y, pt: performance.now(), x0: p.x, y0: p.y, t0: performance.now(), moved: 0 };
       hero.style.cursor = 'grabbing'; kick();
     });
     const drop = () => {
       if (!held) return;
+      if (grab.moved < 8 && performance.now() - grab.t0 < 300) {   // a tap/click is a kick: away from where you hit it, and up
+        const l = Math.hypot(grab.dx, grab.dy) || 1;
+        held.vx = grab.dx / l * 900 + (Math.random() - .5) * 200; held.vy = Math.min(-600, grab.dy / l * 700 - 700);
+      }
       const cap = 2200, v = Math.hypot(held.vx, held.vy);
       if (v > cap) { held.vx *= cap / v; held.vy *= cap / v; }
       held.rest = false; held = null; grab = null; hero.style.cursor = ''; kick();
@@ -721,8 +740,8 @@
       if (held) {
         const dts = Math.max(.008, (now - grab.pt) / 1000);
         held.vx = held.vx * .5 + (p.x - grab.px) / dts * .5; held.vy = held.vy * .5 + (p.y - grab.py) / dts * .5;
-        grab.px = p.x; grab.py = p.y; grab.pt = now;
-        held.x = p.x + grab.dx; held.y = Math.min(p.y + grab.dy, held.kind === 'football' ? 770 : FLOOR - held.r);
+        grab.moved = Math.max(grab.moved, Math.hypot(p.x - grab.x0, p.y - grab.y0)); grab.px = p.x; grab.py = p.y; grab.pt = now;
+        held.x = p.x + grab.dx; held.y = Math.min(p.y + grab.dy, held.kind === 'football' ? Math.min(FLOOR, ground()) - 70 * (held.k || 1) : ground() - held.r);
         if (held.kind === 'shuttle') held.a += (Math.PI / 2 - held.a) * .15;
         if (held.kind !== 'shuttle') held.rot += (p.x - (prevPt ? prevPt.x : p.x)) / held.r;
         prevPt = p; prevT = now; draw(held); return;
@@ -733,9 +752,10 @@
       prevPt = p; prevT = now;
       for (const o of objs) {
         if (t < o.ready || now - (o.hitAt || 0) < 160) continue;
-        const dx = o.x - p.x, dy = o.y - p.y, d = Math.hypot(dx, dy);
-        if (d > o.r + 16) continue;
-        take(o); o.rest = false; o.hitAt = now;
+        const q = local(o, p);
+        if (Math.hypot(o.x - q.x, o.y - q.y) > o.r + 16) continue;
+        take(o);
+        const dx = o.x - p.x, dy = o.y - p.y, d = Math.hypot(dx, dy); o.rest = false; o.hitAt = now;
         const nx = d ? dx / d : 1, ny = d ? dy / d : 0, push = Math.min(1500, 650 + cs * .5);
         if (o.kind === 'football') {
           o.vx += (nx >= 0 ? 1 : -1) * push;
@@ -749,6 +769,22 @@
       if (objs.some(o => o.live && !o.rest)) kick();
     });
     hero.addEventListener('dragstart', (e) => e.preventDefault());
+    // touch: a finger that lands on an object grabs it instead of scrolling; anywhere else the page scrolls as normal
+    hero.addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t && hitAt(toView(t), (performance.now() - t0) / 1000)) e.preventDefault(); }, { passive: false });
+    // as the panel slides up (or back down) everything resting on it gets carried with it
+    // ones still sitting where their intro left them are let loose the moment the panel touches them
+    addEventListener('scroll', () => {
+      const t = (performance.now() - t0) / 1000, G = ground(); let any = false;
+      for (const o of objs) {
+        if (!o.live && t >= o.ready) {
+          const w = wrapOf(o), m = w ? svg.getScreenCTM().inverse().multiply(w.getScreenCTM()) : null;
+          const y = m ? new DOMPoint(o.x, o.y).matrixTransform(m).y : o.y, r = o.r * (m ? Math.hypot(m.a, m.b) : 1);
+          if (y + r > G) take(o);
+        }
+        if (o.live) { o.rest = false; any = true; }
+      }
+      if (any) kick();
+    }, { passive: true });
 
     // click "Play" in the headline: more chalk gear drops into the hero, each one knockable/draggable like the first three
     const layer = svg.querySelector('g[filter]'), NSV = 'http://www.w3.org/2000/svg', MAX = 20, spawned = [];

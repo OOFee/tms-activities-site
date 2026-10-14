@@ -13,7 +13,7 @@
     .egg-title:hover, .egg-word:hover { text-decoration-color: rgba(245,243,236,.6); }
     .egg-title { display: inline-block; transform-origin: 30% 70%; }
     .egg-title:hover, .egg-word:hover { animation: eggWig .55s ease-in-out; }
-    .egg-hint { animation: eggWig .55s ease-in-out 2, eggLine 1.6s ease; }   /* once after load: "I'm clickable" */
+    .egg-hint { animation: eggWig .55s ease-in-out, eggLine 1.6s ease; }   /* once after load: "I'm clickable" */
     @keyframes eggLine { 0%, 100% { text-decoration-color: rgba(245,243,236,0); } 20%, 70% { text-decoration-color: rgba(245,243,236,.7); } }
     @keyframes eggWig { 25% { transform: rotate(-2.5deg) translateY(-2px); } 60% { transform: rotate(2deg); } 100% { transform: none; } }
     .egg-ball { position: absolute; z-index: 3; left: 0; top: 0; cursor: grab; touch-action: none; will-change: transform; }
@@ -240,33 +240,49 @@
     title.addEventListener('click', spawn);
   }
 
-  // tennis: each click sends a ball flying across the screen; click faster and more come
+  // the top edge of the light panel, in viewport pixels (things land on it)
+  const panelTop = () => { const sh = document.querySelector('.sheet'); return sh ? sh.getBoundingClientRect().top : Infinity; };
+
+  // tennis: each click sends a ball flying out over the hero to bounce along the panel; click faster and more come
   if (page === 'tennis') {
-    let clicks = [];
-    const ball = (delay) => {
+    let clicks = [], raf = 0, last = 0;
+    const live = [];
+    const tick = (now) => {
+      const dt = Math.min(.033, (now - (last || now)) / 1000); last = now;
+      const floor = panelTop(), W = innerWidth, H = innerHeight;
+      for (let i = live.length - 1; i >= 0; i--) {
+        const b = live[i];
+        b.vy += 1500 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.vx * dt / b.r;
+        if (floor < H + b.r && b.y > floor - b.r && b.y < floor + b.r * 2) {   // bounce on the panel
+          b.y = floor - b.r; b.vy = Math.abs(b.vy) > 160 ? -Math.abs(b.vy) * .7 : 0; b.vx *= .97;
+        }
+        b.el.style.transform = `translate(${b.x - b.r}px, ${b.y - b.r}px) rotate(${b.a}rad)`;
+        if (b.x > W + 80 || b.x < -80 || b.y > H + 80) { b.el.remove(); live.splice(i, 1); }
+      }
+      raf = live.length ? requestAnimationFrame(tick) : 0;
+    };
+    const ball = () => {
+      if (live.length > 60) return;
       const s = 30 + Math.random() * 16, el = document.createElement('div');
       el.innerHTML = `<svg width="${s}" height="${s}" viewBox="-20 -20 40 40" style="display:block;overflow:visible;filter:drop-shadow(0 6px 8px rgba(0,0,0,.3))">
         <circle r="18" fill="#D9EA3F"/><circle r="18" fill="none" stroke="#B9CB2A" stroke-width="1.5"/>
         <path d="M-12 -13 Q-3 0 -12 13 M12 -13 Q3 0 12 13" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`;
       skyLayer().append(el);
-      const W = innerWidth, H = innerHeight, ltr = Math.random() < .75, tr = title.getBoundingClientRect();
-      const x0 = ltr ? tr.left + tr.width * .5 : W + 40, y0 = ltr ? tr.top + tr.height * .5 : H * (.3 + Math.random() * .4);
-      const x1 = ltr ? W + 60 : -60, y1 = H * (.2 + Math.random() * .7), peak = Math.min(y0, y1) - H * (.15 + Math.random() * .35);
-      const steps = 14, frames = [];
-      for (let i = 0; i <= steps; i++) {
-        const u = i / steps, x = x0 + (x1 - x0) * u, y = (1 - u) * (1 - u) * y0 + 2 * (1 - u) * u * peak + u * u * y1;
-        frames.push({ transform: `translate(${x - s / 2}px, ${y - s / 2}px) rotate(${(ltr ? 1 : -1) * u * 900}deg)` });
-      }
-      const dur = 900 + Math.random() * 700;
-      const a = el.animate(frames, { duration: dur, delay, easing: 'cubic-bezier(.2,.6,.6,1)', fill: 'both' });
-      a.onfinish = () => el.remove();
+      const tr = title.getBoundingClientRect(), ltr = Math.random() < .75;
+      const b = ltr
+        ? { x: tr.left + tr.width * .5, y: tr.top + tr.height * .4, vx: 450 + Math.random() * 650, vy: -(450 + Math.random() * 650) }
+        : { x: innerWidth + 30, y: innerHeight * (.25 + Math.random() * .3), vx: -(500 + Math.random() * 500), vy: -(200 + Math.random() * 400) };
+      Object.assign(b, { el, r: s / 2, a: 0 }); live.push(b);
+      el.style.transform = `translate(${b.x - b.r}px, ${b.y - b.r}px)`;
+      if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
     };
     title.addEventListener('click', () => {
       const now = performance.now(); clicks = clicks.filter(t => now - t < 1200); clicks.push(now);
       const n = Math.min(6, 1 + Math.floor((clicks.length - 1) / 1.5));
-      for (let i = 0; i < n; i++) ball(i * 90);
+      for (let i = 0; i < n; i++) setTimeout(ball, i * 90);
     });
   }
+
 
   // swimming: every click sends up another wave of bubbles (poppable too)
   if (page === 'swimming' && scenery) {
@@ -306,16 +322,21 @@
     let raf = 0, last = 0;
     const tick = (now) => {
       const dt = Math.min(.033, (now - (last || now)) / 1000); last = now;
-      const dpr = devicePixelRatio || 1, W = world.clientWidth, H = world.clientHeight;
+      const dpr = devicePixelRatio || 1, W = world.clientWidth, H = world.clientHeight, floor = Math.min(H, panelTop() - world.getBoundingClientRect().top);
       if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = W * dpr; cv.height = H * dpr; }
       cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
       for (let i = bits.length - 1; i >= 0; i--) {
         const b = bits[i];
         b.vy += 900 * dt; b.vx *= Math.pow(.35, dt); b.vy *= Math.pow(.55, dt);   // air drag, so they float down
-        b.x += (b.vx + Math.sin(b.t * b.sw) * 40) * dt; b.y += b.vy * dt; b.t += dt; b.a += b.va * dt;
-        if (b.y > H + 20 || b.t > 7) { bits.splice(i, 1); continue; }
-        cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.scale(1, Math.cos(b.t * b.fl));   // flips as it tumbles
-        cx.globalAlpha = Math.min(1, (7 - b.t) * 2); cx.fillStyle = b.c;
+        if (!b.landed) {
+          b.x += (b.vx + Math.sin(b.t * b.sw) * 40) * dt; b.y += b.vy * dt; b.a += b.va * dt;
+          if (b.vy > 0 && b.y > floor - 2 && b.y < floor + 40) { b.y = floor - 2 - Math.random() * 3; b.landed = b.t; b.fl = 0; }   // lands flat on the panel
+        } else b.y = floor - 2;
+        b.t += dt;
+        const fade = b.landed ? 1 - Math.max(0, b.t - b.landed - 1.5) / .8 : Math.min(1, (7 - b.t) * 2);
+        if (b.y > H + 20 || b.t > 9 || fade <= 0) { bits.splice(i, 1); continue; }
+        cx.save(); cx.translate(b.x, b.y); cx.rotate(b.a); cx.scale(1, b.landed ? .5 : Math.cos(b.t * b.fl));   // flips as it tumbles
+        cx.globalAlpha = fade; cx.fillStyle = b.c;
         if (b.round) { cx.beginPath(); cx.arc(0, 0, b.s * .45, 0, Math.PI * 2); cx.fill(); } else cx.fillRect(-b.s / 2, -b.s / 4, b.s, b.s / 2);
         cx.restore();
       }
@@ -335,28 +356,44 @@
     });
   }
 
-  // spanish: it rains little Spanish flags
+  // spanish: it rains little Spanish flags; they land on the panel, settle, then fade
   if (page === 'spanish') {
-    let live = 0;
+    const live = [];
+    let raf = 0, last = 0;
+    const tick = (now) => {
+      const dt = Math.min(.033, (now - (last || now)) / 1000); last = now;
+      const floor = panelTop(), H = innerHeight;
+      for (let i = live.length - 1; i >= 0; i--) {
+        const f = live[i]; f.t += dt;
+        if (f.t < 0) continue;
+        if (!f.landed) {
+          f.vy = Math.min(f.vy + 300 * dt, f.max); f.y += f.vy * dt; f.x += (Math.sin(f.t * f.sw) * f.dr) * dt; f.a += f.va * dt;
+          if (floor < H + 40 && f.y + f.h > floor && f.y + f.h < floor + 60) { f.landed = f.t; f.y = floor - f.h; f.a0 = f.a; f.lie = -(66 + Math.random() * 18); }   // tips over pole-first, so the cloth ends up on top
+        } else {
+          const u = Math.min(1, (f.t - f.landed) / .35);
+          f.a = f.a0 + (f.lie - f.a0) * (1 - Math.pow(1 - u, 3));   // tips over onto the panel
+          f.el.style.opacity = Math.max(0, 1 - Math.max(0, f.t - f.landed - 1.4) / .6);
+        }
+        f.el.style.transform = `translate(${f.x}px, ${f.y}px) rotate(${f.a}deg)`;
+        f.el.style.visibility = 'visible';
+        if (f.y > H + 60 || (f.landed && f.t - f.landed > 2)) { f.el.remove(); live.splice(i, 1); }
+      }
+      raf = live.length ? requestAnimationFrame(tick) : 0;
+    };
     const flag = (delay) => {
-      if (live > 220) return;
-      live++;
+      if (live.length > 220) return;
       const w = 26 + Math.random() * 22, h = w * 2 / 3, el = document.createElement('div');
+      el.style.visibility = 'hidden'; el.style.transformOrigin = '2px 100%';
       el.innerHTML = `<svg width="${w}" height="${h + 14}" viewBox="0 -2 30 34" style="display:block;overflow:visible;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))">
         <path d="M1 -2 V32" stroke="#6b5a3a" stroke-width="1.6" stroke-linecap="round"/>
         <g><rect x="1.5" y="0" width="28" height="5" fill="#AA151B"/><rect x="1.5" y="5" width="28" height="10" fill="#F1BF00"/><rect x="1.5" y="15" width="28" height="5" fill="#AA151B"/>
         <animateTransform attributeName="transform" type="skewY" values="0;-6;0;5;0" dur="${(.8 + Math.random() * .6).toFixed(2)}s" repeatCount="indefinite"/></g></svg>`;
       skyLayer().append(el);
-      const x = Math.random() * innerWidth, drift = (Math.random() - .5) * 220, H = innerHeight + 80, spin = (Math.random() - .5) * 120;
-      const dur = 2600 + Math.random() * 2600;
-      const a = el.animate([
-        { transform: `translate(${x}px, -60px) rotate(${spin * .2}deg)` },
-        { transform: `translate(${x + drift * .5 + 30}px, ${H * .35}px) rotate(${-spin * .4}deg)` },
-        { transform: `translate(${x + drift * .8 - 20}px, ${H * .7}px) rotate(${spin * .6}deg)` },
-        { transform: `translate(${x + drift}px, ${H}px) rotate(${spin}deg)` }
-      ], { duration: dur, delay, easing: 'linear', fill: 'both' });
-      a.onfinish = () => { el.remove(); live--; };
+      live.push({ el, x: Math.random() * innerWidth, y: -70, h: h + 14, vy: 60 + Math.random() * 60, max: 180 + Math.random() * 160,
+        sw: 1.5 + Math.random() * 2, dr: 40 + Math.random() * 70, a: (Math.random() - .5) * 30, va: (Math.random() - .5) * 60, t: -delay / 1000 });
+      if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
     };
     title.addEventListener('click', () => { for (let i = 0; i < 45; i++) flag(i * 55 + Math.random() * 400); });
   }
+
 })();
