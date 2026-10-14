@@ -327,4 +327,7 @@ html[lang="ja"] body { font-family: "Figtree", "Hiragino Sans", "Hiragino Kaku G
   .navtoggle { padding: 8px 12px; font-size: 13px; }
 }
 
+/* coach photos across the top of each coach card */
+.ccard .cphoto { width: calc(100% + 56px); max-width: none; margin: -26px -28px 8px; aspect-ratio: 5 / 4; object-fit: cover; object-position: 50% 22%; border-radius: 12px 12px 0 0; background: #e8e5dc; }
+
 @view-transition { navigation: auto; }

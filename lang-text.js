@@ -44,9 +44,9 @@ window.TMS_T = {
   "メニュー",
   "Menú"
  ],
- "Play it <em>the Spanish way.</em>": [
-  "<em>スペイン流</em>でいこう。",
-  "Juega <em>al estilo español.</em>"
+ "<span class=\"playword\">Play</span> it <em>the Spanish way.</em>": [
+  "<em>スペイン流</em>で<span class=\"playword\">いこう</span>。",
+  "<span class=\"playword\">Juega</span> <em>al estilo español.</em>"
  ],
  "Tokyo’s academy for soccer, swimming, tennis and Spanish. Possession, creativity and joy, from Baby School to U18.": [
   "サッカー、水泳、テニス、スペイン語の東京のアカデミー。ポゼッション、創造性、そして楽しさを。ベビースクールからU18まで。",

@@ -39,6 +39,11 @@
 
   .hero { position: sticky; top: 0; height: 100svh; overflow: hidden; z-index: 0; }
   .hero img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
+  .hero > img, .heroChalk { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
+  .playword { display: inline-block; cursor: pointer; }
+  .playword:hover { animation: pwig .55s ease-in-out; }
+  @keyframes pwig { 25% { transform: rotate(-4deg) translateY(-2px); } 60% { transform: rotate(3deg); } 100% { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .playword:hover { animation: none; } }
   .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background:
     radial-gradient(ellipse 75% 95% at 6% 12%, rgba(16,38,26,.72) 0%, rgba(16,38,26,.4) 48%, rgba(16,38,26,0) 72%); }
 
@@ -286,7 +291,7 @@
 </header>
 
 <section class="hero">
-  <img src="https://tmsactivities.jp/wp-content/uploads/2025/05/WhatsApp-Image-2025-05-18-at-11.03.35.jpeg" alt="TMS players training in Tokyo">
+  <img src="https://tmsactivities.jp/wp-content/uploads/2025/05/WhatsApp-Image-2025-05-18-at-11.03.35.jpeg" alt="TMS players training in Tokyo" draggable="false">
   <svg class="heroChalk" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
       <filter id="chalkHero" filterUnits="userSpaceOnUse" x="0" y="0" width="1440" height="900">
@@ -373,7 +378,7 @@
     </g>
   </svg>
   <div class="heroText">
-    <h1 class="serif">Play it <em>the Spanish way.</em></h1>
+    <h1 class="serif"><span class="playword">Play</span> it <em>the Spanish way.</em></h1>
     <p class="deck">Tokyo’s academy for soccer, swimming, tennis and Spanish. Possession, creativity and joy, from Baby School to U18.</p>
   </div>
 </section>
@@ -669,7 +674,7 @@
         } else if (o.kind === 'tennis') {
           o.vy += 1800 * dt; o.x += o.vx * dt; o.y += o.vy * dt; o.rot += o.vx * dt / o.r;
           const fy = FLOOR - o.r;
-          if (o.y > fy) { o.y = fy; o.vy = -o.vy * .72; o.vx *= .9; if (Math.abs(o.vy) < 60) o.vy = 0; }
+          if (o.y > fy) { o.y = fy; o.vy = -o.vy * (o.bounce || .72); o.vx *= .9; if (Math.abs(o.vy) < 60) o.vy = 0; }
           if (o.y >= fy && !o.vy) { o.vx *= Math.exp(-2.5 * dt); if (Math.abs(o.vx) < 4) o.rest = true; }
           if (o.x < b.l + o.r) { o.x = b.l + o.r; o.vx = Math.abs(o.vx) * .7; }
           if (o.x > b.r - o.r) { o.x = b.r - o.r; o.vx = -Math.abs(o.vx) * .7; }
@@ -720,8 +725,8 @@
         prevPt = p; prevT = now; draw(held); return;
       }
       hero.style.cursor = hitAt(p, t) ? 'grab' : '';
-      let cs = 0;
-      if (prevPt && now - prevT < 80) cs = Math.hypot(p.x - prevPt.x, p.y - prevPt.y) / ((now - prevT) / 1000);
+      let cs = 0, cvy = 0;
+      if (prevPt && now - prevT < 80) { const ds = (now - prevT) / 1000; cs = Math.hypot(p.x - prevPt.x, p.y - prevPt.y) / ds; cvy = (p.y - prevPt.y) / ds; }
       prevPt = p; prevT = now;
       for (const o of objs) {
         if (t < o.ready || now - (o.hitAt || 0) < 160) continue;
@@ -729,11 +734,50 @@
         if (d > o.r + 16) continue;
         take(o); o.rest = false; o.hitAt = now;
         const nx = d ? dx / d : 1, ny = d ? dy / d : 0, push = Math.min(1500, 650 + cs * .5);
-        if (o.kind === 'football') o.vx += (nx >= 0 ? 1 : -1) * push;
+        if (o.kind === 'football') {
+          o.vx += (nx >= 0 ? 1 : -1) * push;
+          // a little hop only when the push has some lift in it: struck from below, or a swipe moving upward
+          const lift = Math.max(0, -ny) * push * .6 + Math.max(0, -cvy) * .35;
+          if (lift > 120) o.vy = Math.min(o.vy, -Math.min(520, lift));
+        }
         else if (o.kind === 'tennis') { o.vx += nx * push * .7; o.vy += Math.min(ny, -.35) * push * .8; }
         else { o.vx += nx * push * 1.1; o.vy += ny * push * 1.1 - 200; }
       }
       if (objs.some(o => o.live && !o.rest)) kick();
+    });
+    hero.addEventListener('dragstart', (e) => e.preventDefault());
+
+    // click "Play" in the headline: more chalk gear drops into the hero, each one knockable/draggable like the first three
+    const layer = svg.querySelector('g[filter]'), NSV = 'http://www.w3.org/2000/svg', MAX = 20, spawned = [];
+    const art = {
+      football: () => { const g = document.querySelector('.heroChalk .roll').cloneNode(true); g.removeAttribute('class'); g.style.cssText = ''; g.setAttribute('transform', 'scale(1.05)'); return g; },
+      tennis: () => { const g = document.querySelector('#hTennisObj .spin').cloneNode(true); g.querySelectorAll('animateTransform').forEach(a => a.remove()); g.removeAttribute('class'); return g; },
+      basket: () => { const g = document.createElementNS(NSV, 'g');
+        g.innerHTML = '<circle r="31" fill="url(#hHatch)" opacity=".55"/><circle class="s" r="31"/><path class="s" style="stroke-width:2" d="M-31 0 H31 M0 -31 V31 M-22 -22 Q-8 0 -22 22 M22 -22 Q8 0 22 22"/>'; return g; },
+      shuttle: () => { const g = document.createElementNS(NSV, 'g');
+        [...document.getElementById('hShuttleObj').children].forEach(c => { if (!/^(set|animateMotion|mask)$/.test(c.tagName)) g.appendChild(c.cloneNode(true)); }); return g; },
+    };
+    const SPEC = { football: { r: 36, bounce: .55 }, tennis: { r: 26, bounce: .72 }, basket: { r: 31, bounce: .62 }, shuttle: { r: 30 } };
+    const spawn = () => {
+      const b = bounds(), types = Object.keys(SPEC), type = types[Math.floor(Math.random() * types.length)];
+      const outer = document.createElementNS(NSV, 'g'), inner = art[type]();
+      if (type !== 'shuttle') inner.setAttribute('class', 'spin');
+      outer.appendChild(inner); layer.appendChild(outer);
+      const x = b.l + 80 + Math.random() * (b.r - b.l - 160);
+      const o = { kind: type === 'shuttle' ? 'shuttle' : 'tennis', el: outer, ready: 0, r: SPEC[type].r, bounce: SPEC[type].bounce, live: true, spawned: true,
+        x, y: b.t - 40, vx: (Math.random() - .5) * 500, vy: 120 + Math.random() * 200, rot: 0, a: Math.PI / 2 };
+      if (type === 'tennis' || type === 'football' || type === 'basket') {
+        // .spin child of a cloned football carries its own scale; keep rotation on a wrapper so draw() can set it
+        if (type === 'football') { const w = document.createElementNS(NSV, 'g'); w.setAttribute('class', 'spin'); inner.removeAttribute('class'); outer.appendChild(w); w.appendChild(inner); }
+      }
+      objs.push(o); spawned.push(o); draw(o);
+      if (spawned.length > MAX) { const old = spawned.shift(); objs.splice(objs.indexOf(old), 1);
+        old.el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' }).onfinish = () => old.el.remove(); }
+      kick();
+    };
+    document.querySelector('.heroText h1').addEventListener('click', (e) => {
+      if (!e.target.closest('.playword')) return;
+      for (let i = 0; i < 3; i++) setTimeout(spawn, i * 140);
     });
   })();
 
