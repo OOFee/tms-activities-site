@@ -13,6 +13,8 @@
     .egg-title:hover, .egg-word:hover { text-decoration-color: rgba(245,243,236,.6); }
     .egg-title { display: inline-block; transform-origin: 30% 70%; }
     .egg-title:hover, .egg-word:hover { animation: eggWig .55s ease-in-out; }
+    .egg-hint { animation: eggWig .55s ease-in-out 2, eggLine 1.6s ease; }   /* once after load: "I'm clickable" */
+    @keyframes eggLine { 0%, 100% { text-decoration-color: rgba(245,243,236,0); } 20%, 70% { text-decoration-color: rgba(245,243,236,.7); } }
     @keyframes eggWig { 25% { transform: rotate(-2.5deg) translateY(-2px); } 60% { transform: rotate(2deg); } 100% { transform: none; } }
     .egg-ball { position: absolute; z-index: 3; left: 0; top: 0; cursor: grab; touch-action: none; will-change: transform; }
     .egg-ball svg { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -151,6 +153,12 @@
   const title = document.querySelector('.world-copy h1');
   if (!title || reduce || !['soccer', 'tennis', 'spanish', 'swimming', 'parties'].includes(page)) return;
   if (page !== 'parties') title.classList.add('egg-title');
+  setTimeout(() => {
+    const el = page === 'parties' ? title.querySelector('.egg-word') : title;
+    if (!el || el.matches(':hover')) return;
+    el.classList.add('egg-hint');
+    el.addEventListener('animationend', e => { if (e.animationName === 'eggLine') el.classList.remove('egg-hint'); });
+  }, innerWidth <= 700 ? 900 : 1500);
   title.addEventListener('mousedown', e => { if (e.detail > 1) e.preventDefault(); });
   let sky;
   const skyLayer = () => { if (!sky) { sky = document.createElement('div'); sky.className = 'egg-sky'; document.body.append(sky); } return sky; };

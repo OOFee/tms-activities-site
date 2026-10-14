@@ -44,7 +44,9 @@
   .playword:hover { text-decoration-color: rgba(245,243,236,.6); }
   .playword:hover { animation: pwig .55s ease-in-out; }
   @keyframes pwig { 25% { transform: rotate(-4deg) translateY(-2px); } 60% { transform: rotate(3deg); } 100% { transform: none; } }
-  @media (prefers-reduced-motion: reduce) { .playword:hover { animation: none; } }
+  .playword.hint { animation: pwig .55s ease-in-out 2, pline 1.6s ease; }   /* once after load: "I'm clickable" */
+  @keyframes pline { 0%, 100% { text-decoration-color: rgba(245,243,236,0); } 20%, 70% { text-decoration-color: rgba(245,243,236,.7); } }
+  @media (prefers-reduced-motion: reduce) { .playword:hover, .playword.hint { animation: none; } }
   .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background:
     radial-gradient(ellipse 75% 95% at 6% 12%, rgba(16,38,26,.72) 0%, rgba(16,38,26,.4) 48%, rgba(16,38,26,0) 72%); }
 
@@ -776,6 +778,10 @@
         old.el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' }).onfinish = () => old.el.remove(); }
       kick();
     };
+    setTimeout(() => {   // nudge the clickable word once so people know
+      const pw = document.querySelector('.playword'); if (!pw || pw.matches(':hover')) return;
+      pw.classList.add('hint'); pw.addEventListener('animationend', e => { if (e.animationName === 'pline') pw.classList.remove('hint'); });
+    }, innerWidth <= 700 ? 1200 : 2000);
     document.querySelector('.heroText h1').addEventListener('click', (e) => {
       if (!e.target.closest('.playword')) return;
       for (let i = 0; i < 3; i++) setTimeout(spawn, i * 140);
