@@ -8,8 +8,11 @@
 
   const css = `
     .world .scenery .poppable { pointer-events: all; cursor: pointer; }
-    .egg-title { cursor: pointer; -webkit-user-select: none; user-select: none; }
-    .egg-title:active { transform: scale(.98); }
+    .egg-title { cursor: pointer; text-decoration: underline wavy rgba(245,243,236,0); text-decoration-thickness: 2px; text-underline-offset: .12em; transition: text-decoration-color .25s; }
+    .egg-title:hover { text-decoration-color: rgba(245,243,236,.6); }
+    .egg-title { display: inline-block; transform-origin: 30% 70%; }
+    .egg-title:hover { animation: eggWig .55s ease-in-out; }
+    @keyframes eggWig { 25% { transform: rotate(-2.5deg) translateY(-2px); } 60% { transform: rotate(2deg); } 100% { transform: none; } }
     .egg-ball { position: absolute; z-index: 3; left: 0; top: 0; cursor: grab; touch-action: none; will-change: transform; }
     .egg-ball svg { width: 100%; height: 100%; display: block; overflow: visible; }
     .egg-sky { position: fixed; inset: 0; z-index: 56; pointer-events: none; overflow: hidden; }
@@ -224,7 +227,7 @@
       el.addEventListener('pointerup', release); el.addEventListener('pointercancel', release);
       if (!raf) raf = requestAnimationFrame(tick);
     };
-    title.addEventListener('click', spawn);
+    title.addEventListener('click', () => { if (getSelection().isCollapsed) spawn(); });
   }
 
   // tennis: each click sends a ball flying across the screen; click faster and more come
@@ -249,6 +252,7 @@
       a.onfinish = () => el.remove();
     };
     title.addEventListener('click', () => {
+      if (!getSelection().isCollapsed) return;
       const now = performance.now(); clicks = clicks.filter(t => now - t < 1200); clicks.push(now);
       const n = Math.min(6, 1 + Math.floor((clicks.length - 1) / 1.5));
       for (let i = 0; i < n; i++) ball(i * 90);
@@ -277,6 +281,6 @@
       ], { duration: dur, delay, easing: 'linear', fill: 'both' });
       a.onfinish = () => { el.remove(); live--; };
     };
-    title.addEventListener('click', () => { for (let i = 0; i < 45; i++) flag(i * 55 + Math.random() * 400); });
+    title.addEventListener('click', () => { if (getSelection().isCollapsed) for (let i = 0; i < 45; i++) flag(i * 55 + Math.random() * 400); });
   }
 })();
