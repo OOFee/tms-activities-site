@@ -624,7 +624,7 @@
   /* hero chalk, after the intro: nudge a ball or the shuttle and it rolls / bounces / flies away; hold-click to drag and throw */
   (() => {
     const svg = document.querySelector('.heroChalk'), hero = document.querySelector('.hero');
-    if (!svg || !hero || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!svg || !hero) return;   // knocking things about only happens when you do it, so it runs even with reduced motion
     const t0 = performance.now(), FLOOR = 840;
     const strip = (g) => g.querySelectorAll(':scope > set, :scope > animateMotion, :scope > g > animateTransform').forEach(a => a.remove());
     const shuttlePath = document.getElementById('hShuttle'), sp = shuttlePath.getTotalLength();

@@ -13,6 +13,7 @@
     .egg-title:hover, .egg-word:hover { text-decoration-color: rgba(245,243,236,.6); }
     .egg-title { display: inline-block; transform-origin: 30% 70%; }
     .egg-title:hover, .egg-word:hover { animation: eggWig .55s ease-in-out; }
+    @media (prefers-reduced-motion: reduce) { .egg-title:hover, .egg-word:hover { animation: none; } }
     .egg-hint { animation: eggWig .55s ease-in-out, eggLine 1.6s ease; }   /* once after load: "I'm clickable" */
     @keyframes eggLine { 0%, 100% { text-decoration-color: rgba(245,243,236,0); } 20%, 70% { text-decoration-color: rgba(245,243,236,.7); } }
     @keyframes eggWig { 25% { transform: rotate(-2.5deg) translateY(-2px); } 60% { transform: rotate(2deg); } 100% { transform: none; } }
@@ -151,9 +152,9 @@
 
   // title toys ------------------------------------------------------------------------------------------------
   const title = document.querySelector('.world-copy h1');
-  if (!title || reduce || !['soccer', 'tennis', 'spanish', 'swimming', 'parties'].includes(page)) return;
+  if (!title || !['soccer', 'tennis', 'spanish', 'swimming', 'parties'].includes(page)) return;   // these only move when you ask, so they run even with reduced motion
   if (page !== 'parties') title.classList.add('egg-title');
-  setTimeout(() => {
+  if (!reduce) setTimeout(() => {
     const el = page === 'parties' ? title.querySelector('.egg-word') : title;
     if (!el || el.matches(':hover')) return;
     el.classList.add('egg-hint');
