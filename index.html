@@ -64,6 +64,7 @@
   }
   .heroChalk .ht.stay { animation: hdraw var(--dur) cubic-bezier(.3,0,.4,1) var(--del) forwards; }
   .heroChalk .ht.blip { animation: hdraw .25s ease-out var(--del) forwards, hgone .6s ease calc(var(--del) + .5s) forwards; }
+  .heroChalk .ht.sset { animation: hsettle 1.2s ease 2.4s forwards; }
   .heroChalk .ht.late { animation: hsettle 1.2s ease 3.1s forwards; }
   .heroChalk .roll { transform: translate(-120px, 770px) rotate(-445deg) scale(1.6); animation: hroll 1.9s 1.3s forwards; }
   .heroChalk .rollx { transform: translate(-120px, 770px); animation: hrollx 1.9s 1.3s forwards; }
@@ -305,8 +306,11 @@
     </defs>
     <g filter="url(#chalkHero)">
       <g class="hcS"><!-- shuttlecock: swirls in on a looping line, cork first -->
-      <path id="hShuttle" class="ht go" pathLength="1" style="--del:.3s;--dur:1.6s"
-        d="M1500 70 C1360 40 1220 120 1240 220 C1256 300 1370 300 1372 236 C1374 176 1290 170 1230 230 C1170 290 1110 300 1040 286"/>
+      <!-- trail drawn on the same SMIL clock as the shuttle so it can never run ahead of it -->
+      <path id="hShuttle" class="ht sset" pathLength="1"
+        d="M1500 70 C1360 40 1220 120 1240 220 C1256 300 1370 300 1372 236 C1374 176 1290 170 1230 230 C1170 290 1110 300 1040 286">
+        <animate attributeName="stroke-dashoffset" begin=".3s" dur="1.6s" fill="freeze" values="1;0" keyTimes="0;1" calcMode="spline" keySplines=".3 0 .4 1"/>
+      </path>
       <g id="hShuttleObj" opacity="0">
         <set attributeName="opacity" to="1" begin=".3s" fill="freeze"/>
         <animateMotion dur="1.6s" begin=".3s" fill="freeze" rotate="auto" calcMode="spline" keyPoints="0;1" keyTimes="0;1" keySplines=".3 0 .4 1"><mpath href="#hShuttle"/></animateMotion>
