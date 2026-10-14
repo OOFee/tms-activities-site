@@ -47,6 +47,12 @@
   .hero h1 em { font-style: italic; font-weight: 420; color: var(--flood); }
   .hero .deck { margin-top: 18px; max-width: 38ch; font-size: 18px; line-height: 1.6; color: #f5f3ec; text-wrap: pretty; text-shadow: 0 1px 6px rgba(0,0,0,.65), 0 6px 24px rgba(0,0,0,.5); }
   @media (max-width: 700px) { .heroText { max-width: 88vw; } }
+  /* phones only see the middle slice of the hero board, so the three chalk objects move into it, a bit smaller */
+  @media (max-width: 700px) {
+    .heroChalk .hcS { transform: translate(830px, 160px) scale(.6) translate(-1270px, -210px); }
+    .heroChalk .hcT { transform: translate(800px, 610px) scale(.75) translate(-1100px, -570px); }
+    .heroChalk .hcF { transform: translate(610px, 790px) scale(.7) translate(-300px, -770px); }
+  }
 
   /* hero: chalk sports drawn in on page load - shuttle swirls in, tennis ball bounces, football rolls */
   .heroChalk { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
@@ -298,7 +304,7 @@
       </pattern>
     </defs>
     <g filter="url(#chalkHero)">
-      <!-- shuttlecock: swirls in on a looping line, cork first -->
+      <g class="hcS"><!-- shuttlecock: swirls in on a looping line, cork first -->
       <path id="hShuttle" class="ht go" pathLength="1" style="--del:.3s;--dur:1.6s"
         d="M1500 70 C1360 40 1220 120 1240 220 C1256 300 1370 300 1372 236 C1374 176 1290 170 1230 230 C1170 290 1110 300 1040 286"/>
       <g id="hShuttleObj" opacity="0">
@@ -316,9 +322,9 @@
         <path d="M-1 -8 Q13 -8 13 0 Q13 8 -1 8 Z" fill="#FFFFFF"/>
         <path d="M0 -7 Q12 -7 12 0 Q12 7 0 7 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2"/>
         <path class="s" d="M0 -7 Q12 -7 12 0 Q12 7 0 7 Z M0 -7 L-36 -18 M0 7 L-36 18 M-36 -18 Q-40 0 -36 18 M0 -2 L-36 -6 M0 2 L-36 6 M-13 -11 L-13 11 M-27 -15.3 L-27 15.3"/>
-      </g>
+      </g></g>
 
-      <!-- tennis ball: bounces in from the bottom right in big arcs, freezes at the top of the last one.
+      <g class="hcT"><!-- tennis ball: bounces in from the bottom right in big arcs, freezes at the top of the last one.
            Timed per segment: speeds up falling into each bounce, slows rising to each peak. Trail is drawn in step. -->
       <path id="hTennis" class="ht late" pathLength="1"
         d="M1540 420 Q1480 400 1420 814 Q1310 340 1200 814 Q1150 570 1100 570">
@@ -341,9 +347,9 @@
           <circle class="s" r="26"/>
           <path class="s" d="M-17 -19 Q-5 0 -17 19 M17 -19 Q5 0 17 19"/>
         </g>
-      </g>
+      </g></g>
 
-      <!-- football: rolls in from the bottom left, overshoots a touch and rocks back to rest; speed lines stay behind it -->
+      <g class="hcF"><!-- football: rolls in from the bottom left, overshoots a touch and rocks back to rest; speed lines stay behind it -->
       <clipPath id="hBallClip"><circle r="34"/></clipPath>
       <!-- speed lines ride with the ball: long while it's fast, shrinking as it slows, short once it rests -->
       <g class="rollx">
@@ -359,7 +365,7 @@
           <path class="s" style="stroke-width:1.3" d="M0.0 -11.5 L0.0 -19.5 M10.9 -3.6 L18.5 -6.0 M6.8 9.3 L11.5 15.8 M-6.8 9.3 L-11.5 15.8 M-10.9 -3.6 L-18.5 -6.0 M10.0 -26.8 L21.7 -29.9 M22.4 -17.8 L21.7 -29.9 M28.5 1.2 L35.2 11.4 M23.8 15.8 L35.2 11.4 M7.6 27.5 L0.0 37.0 M-7.6 27.5 L0.0 37.0 M-23.8 15.8 L-35.2 11.4 M-28.5 1.2 L-35.2 11.4 M-22.4 -17.8 L-21.7 -29.9 M-10.0 -26.8 L-21.7 -29.9"/>
         </g>
         <circle class="s" r="34" style="stroke-width:1.8"/>
-      </g>
+      </g></g>
     </g>
   </svg>
   <div class="heroText">
