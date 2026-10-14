@@ -52,18 +52,20 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
     const reveal = () => requestAnimationFrame(() => requestAnimationFrame(() => {
       if (st) st.textContent += 'html .world>*,html .sheet>*,html footer,html .hero>*{transition:opacity .6s ease}';
       docEl.classList.remove('pt-fade');
-      // coming from the homepage (no panel there), this page's panel slides up into place
-      const sheet = docEl.classList.contains('pt-from-home') && document.querySelector('.sheet');
-      if (sheet) {
-        const under = [docEl, document.body];
-        const bg = getComputedStyle(document.querySelector('.world') || document.body).backgroundColor;
-        under.forEach(el => el.style.backgroundColor = bg);   // the gap under the banner matches it until the panel arrives
-        sheet.style.transition = 'transform .65s cubic-bezier(.2,.75,.3,1)';
-        docEl.classList.remove('pt-from-home');
-        setTimeout(() => { sheet.style.transition = ''; under.forEach(el => el.style.backgroundColor = ''); }, 700);
-      } else docEl.classList.remove('pt-from-home');
       setTimeout(() => st && st.remove(), 600);
     }));
+    // coming from the homepage (no panel there), this page's panel glides up straight away; its content
+    // fades in once the photo and fonts are ready
+    const sheet = docEl.classList.contains('pt-from-home') && document.querySelector('.sheet');
+    if (sheet) requestAnimationFrame(() => requestAnimationFrame(() => {
+      const under = [docEl, document.body];
+      const bg = getComputedStyle(document.querySelector('.world') || document.body).backgroundColor;
+      under.forEach(el => el.style.backgroundColor = bg);   // the gap under the banner matches it until the panel arrives
+      sheet.style.transition = 'transform .9s cubic-bezier(.16,1,.3,1)';
+      docEl.classList.remove('pt-from-home');
+      setTimeout(() => { sheet.style.transition = ''; under.forEach(el => el.style.backgroundColor = ''); }, 950);
+    }));
+    else docEl.classList.remove('pt-from-home');
     // wait for the web fonts as well, so text doesn't reflow (jiggle) while it fades in
     const show = () => Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 600))]).then(reveal);
     const img = document.querySelector('.world-photo img, .hero img');
