@@ -139,14 +139,14 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
         }
         world.style.transition = 'background-color .45s ease';
         world.style.backgroundColor = color;
-        sessionStorage.setItem('ptFade', '1'); sessionStorage.setItem('ptColor', color);
+        sessionStorage.setItem('ptFade', '1');
         setTimeout(() => { location.href = u.href; }, 470);
         return;
       }
       // homepage: its photo hero washes over in the next page's colour while the headline and chalk fade
       const hero = document.querySelector('.hero');
       if (hero) {
-        sessionStorage.setItem('ptFade', 'home'); sessionStorage.setItem('ptColor', color); sessionStorage.setItem('ptHome', color);
+        sessionStorage.setItem('ptFade', 'home'); sessionStorage.setItem('ptHome', color);
         [...hero.children].forEach(el => { el.style.transition = 'opacity .35s ease'; el.style.opacity = '0'; });
         const wash = document.createElement('div');
         wash.style.cssText = `position:absolute;inset:0;z-index:5;background:${color};opacity:0;transition:opacity .45s ease;pointer-events:none`;

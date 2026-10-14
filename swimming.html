@@ -22,7 +22,7 @@
   if (pf) { sessionStorage.removeItem('ptFade');
     var f2 = document.createElement('style'); f2.id = 'pt-fade-style';
     f2.textContent = 'html.pt-fade .world>*,html.pt-fade .sheet>*,html.pt-fade footer{opacity:0}';
-    sessionStorage.removeItem('ptHome');
+    if (pf === 'home') { f2.textContent += 'html.pt-from-home .sheet{transform:translateY(100vh)}html.pt-from-home,html.pt-from-home body{background:' + (sessionStorage.getItem('ptHome') || '#152019') + '}'; sessionStorage.removeItem('ptHome'); document.documentElement.classList.add('pt-from-home'); }
     document.head.appendChild(f2); document.documentElement.classList.add('pt-fade'); }
 }catch(e){}})();
 </script>
