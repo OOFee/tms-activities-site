@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C · Floodlights · TMS Activities</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Figtree:wght@400;500;600;700&family=Caveat:wght@600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+  :root {
+    --night: #0E1A14;
+    --chalk: #F5F3EC;
+    --flood: #EFD9A7;
+    --grass: #3E7C4F;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--night); color: var(--chalk); font: 16.5px/1.65 "Figtree", sans-serif; }
+  img { display: block; max-width: 100%; }
+  .serif { font-family: "Fraunces", serif; font-optical-sizing: auto; font-weight: 380; letter-spacing: -.015em; }
+
+  header {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 60;
+    width: auto; max-width: calc(100% - 28px);
+    display: flex; align-items: center; gap: 34px; flex-wrap: nowrap; white-space: nowrap;
+    padding: 5px 7px 5px 30px;
+    background: rgba(250,249,245,.42);
+    -webkit-backdrop-filter: blur(16px) saturate(1.25);
+    backdrop-filter: blur(16px) saturate(1.25);
+    border: 1px solid rgba(20,25,22,.1);
+    border-radius: 999px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  }
+  .word { font-family: "Fraunces", serif; font-size: 18.5px; font-weight: 500; color: #1C2420; white-space: nowrap; }
+  nav { margin-left: auto; display: flex; gap: 22px; font-size: 14.5px; font-weight: 500; }   /* same spacing as the pill on the other pages */
+  nav a { color: #1C2420; text-decoration: none; opacity: .85; }
+  nav a:hover { opacity: 1; border-bottom: 1px solid var(--flood); }
+  .join { color: var(--chalk); background: #1C2420; text-decoration: none; font-weight: 600; font-size: 14px; padding: 8px 18px; border-radius: 999px; }
+
+  .hero { position: sticky; top: 0; height: 100svh; overflow: hidden; z-index: 0; }
+  .hero img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
+  .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background:
+    radial-gradient(ellipse 75% 95% at 6% 12%, rgba(16,38,26,.72) 0%, rgba(16,38,26,.4) 48%, rgba(16,38,26,0) 72%); }
+
+  .heroText { position: absolute; z-index: 2; left: clamp(24px, 4.5vw, 60px); top: 26vh; max-width: 620px; }
+  .hero h1 { font-size: clamp(42px, 5.6vw, 86px); line-height: 1.0; font-weight: 350; letter-spacing: -.028em; text-shadow: 0 2px 10px rgba(0,0,0,.6), 0 10px 40px rgba(0,0,0,.5); }
+  .hero h1 em { font-style: italic; font-weight: 420; color: var(--flood); }
+  .hero .deck { margin-top: 18px; max-width: 38ch; font-size: 18px; line-height: 1.6; color: #f5f3ec; text-wrap: pretty; text-shadow: 0 1px 6px rgba(0,0,0,.65), 0 6px 24px rgba(0,0,0,.5); }
+  @media (max-width: 700px) { .heroText { max-width: 88vw; } }
+
+  /* hero: chalk sports drawn in on page load - shuttle swirls in, tennis ball bounces, football rolls */
+  .heroChalk { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+  .heroChalk .s, .heroChalk .ht { fill: none; stroke: #F3F1E8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .heroChalk .ht { stroke-width: 2.4; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .heroChalk .ht.go {
+    animation: hdraw var(--dur) cubic-bezier(.3,0,.4,1) var(--del) forwards,
+               hsettle 1.2s ease calc(var(--del) + var(--dur) + .5s) forwards;
+  }
+  .heroChalk .ht.stay { animation: hdraw var(--dur) cubic-bezier(.3,0,.4,1) var(--del) forwards; }
+  .heroChalk .ht.blip { animation: hdraw .25s ease-out var(--del) forwards, hgone .6s ease calc(var(--del) + .5s) forwards; }
+  .heroChalk .ht.late { animation: hsettle 1.2s ease 3.1s forwards; }
+  .heroChalk .roll { transform: translate(-120px, 770px) rotate(-445deg) scale(1.6); animation: hroll 1.9s 1.3s forwards; }
+  .heroChalk .rollx { transform: translate(-120px, 770px); animation: hrollx 1.9s 1.3s forwards; }
+  .heroChalk .speed { transform-origin: -64px 0; transform: scaleX(1.5); animation: hspeed 1.9s 1.3s forwards; }
+  @keyframes hrollx {
+    0%   { transform: translate(-120px, 770px); animation-timing-function: cubic-bezier(.15,.6,.35,1); }
+    62%  { transform: translate(312px, 770px); animation-timing-function: ease-in-out; }
+    80%  { transform: translate(296px, 770px); animation-timing-function: ease-in-out; }
+    100% { transform: translate(300px, 770px); }
+  }
+  @keyframes hspeed {
+    0%   { transform: scaleX(1.5); opacity: 1; animation-timing-function: cubic-bezier(.15,.6,.35,1); }
+    62%  { transform: scaleX(.42); }
+    71%  { transform: scaleX(.3); opacity: .55; }
+    100% { transform: scaleX(.55); opacity: 1; }
+  }
+  /* decelerates like friction, overshoots a few px, rocks back to rest */
+  @keyframes hroll {
+    0%   { transform: translate(-120px, 770px) rotate(-445deg) scale(1.6); animation-timing-function: cubic-bezier(.15,.6,.35,1); }
+    62%  { transform: translate(312px, 770px) rotate(13deg) scale(1.6); animation-timing-function: ease-in-out; }
+    80%  { transform: translate(296px, 770px) rotate(-4deg) scale(1.6); animation-timing-function: ease-in-out; }
+    100% { transform: translate(300px, 770px) rotate(0deg) scale(1.6); }
+  }
+  @keyframes hdraw { to { stroke-dashoffset: 0; } }
+  @keyframes hsettle { to { opacity: .7; } }
+  @keyframes hgone { to { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .heroChalk .ht { animation: none !important; stroke-dashoffset: 0; opacity: .7; }
+    .heroChalk .ht.blip { opacity: 0; }
+    .heroChalk .roll { animation: none; transform: translate(300px, 770px) scale(1.6); }
+    .heroChalk .rollx { animation: none; transform: translate(300px, 770px); }
+    .heroChalk .speed { animation: none; transform: scaleX(.55); }
+  }
+
+  /* activity cards - light sheet sliding over the fixed hero */
+  .games {
+    position: relative; z-index: 1;
+    background: var(--chalk); color: #1C2420;
+    border-radius: clamp(22px, 4vw, 44px) clamp(22px, 4vw, 44px) 0 0;
+    box-shadow: 0 -4px 10px rgba(0,0,0,.55), 0 -18px 28px rgba(0,0,0,.6);
+  }
+  .games-inner { max-width: 1280px; margin: 0 auto; padding: 104px 48px 120px; }
+  .games h2 { font-family: "Fraunces", serif; font-weight: 380; font-size: clamp(32px, 4vw, 52px); letter-spacing: -.02em; }
+  .games h2 em { font-style: italic; color: var(--grass); }
+  .games .lede { margin-top: 12px; color: #4b544e; max-width: 56ch; font-size: 17.5px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 56px; }
+
+  .tile {
+    --c: var(--grass);
+    background: #fff; border-radius: 12px; overflow: hidden;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+    box-shadow: 0 2px 6px rgba(20,30,24,.06), 0 14px 34px rgba(20,30,24,.08);
+    opacity: 0; transform: translateY(26px) rotate(var(--tilt, 0deg));
+    transition: opacity .8s cubic-bezier(.22,.8,.3,1), transform .8s cubic-bezier(.22,.8,.3,1),
+                box-shadow .35s ease;
+  }
+  .tile.in { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
+  .tile.in:hover, .tile.in:focus-visible { transform: rotate(0deg); }
+  .grid .tile:nth-child(1) { --tilt: -1.1deg; }
+  .grid .tile:nth-child(2) { --tilt: .9deg; }
+  .grid .tile:nth-child(3) { --tilt: -.7deg; }
+  .grid .tile:nth-child(4) { --tilt: 1.2deg; }
+  .grid .tile:nth-child(5) { --tilt: -.9deg; }
+  .grid .tile:nth-child(6) { --tilt: .8deg; }
+  .tile:hover { box-shadow: 0 4px 10px rgba(20,30,24,.08), 0 24px 54px rgba(20,30,24,.14); }
+  .ph { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+  .ph img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+  .tile:hover .ph img.bg { transform: scale(1.045); }
+  .body { padding: 26px 28px 30px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .body h3 { font-family: "Fraunces", serif; font-weight: 420; font-size: 29px; letter-spacing: -.015em; }
+  .pill { font-size: 13px; font-weight: 700; letter-spacing: .02em; color: #fff; background: var(--c); border-radius: 999px; padding: 4px 13px; }
+  .body p { color: #4b544e; font-size: 15.5px; }
+
+  .t-soccer { --c: var(--grass); }
+  .t-swim { --c: #2B6B8F; }
+  .t-tennis { --c: #8F9A3A; }
+  .t-spanish { --c: #B5443A; }
+  .t-party { --c: #B04E78; }
+
+  .fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .45s ease; }
+  .tile:hover .fx, .tile:focus-visible .fx { opacity: 1; }
+
+  /* chalk board: a coach's chalk drawing itself over a dimmed photo */
+  .fx-chalk { background: rgba(14,28,20,.52); }
+  .tile:hover .ph img.bg { filter: saturate(.35) brightness(.85); }
+  .ph img.bg { transition: transform .6s ease, filter .5s ease; }
+  .fx-chalk svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .fx-chalk .d {
+    fill: none; stroke: #F3F1E8; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0;
+    transition: stroke-dashoffset 0s .45s, opacity 0s .45s;   /* reset only after the layer has faded */
+  }
+  .fx-chalk .d.net { stroke-width: 5; }
+  .fx-chalk .w {
+    fill: #F3F1E8; font-family: "Caveat", cursive; font-weight: 600;
+    clip-path: inset(-20% 100% -20% 0); transition: clip-path 0s .45s;
+  }
+  .tile:hover .fx-chalk .d, .tile:focus-visible .fx-chalk .d {
+    stroke-dashoffset: 0; opacity: 1;
+    transition: stroke-dashoffset var(--dur, .6s) cubic-bezier(.55,.1,.45,1) var(--del, 0s), opacity 0s var(--del, 0s);
+  }
+  .tile:hover .fx-chalk .w, .tile:focus-visible .fx-chalk .w {
+    clip-path: inset(-20% 0 -20% 0);
+    transition: clip-path var(--dur, .8s) cubic-bezier(.4,0,.6,1) var(--del, 0s);
+  }
+
+  /* after drawing: balloons bob, candle flames flicker */
+  .fx-chalk .bob, .fx-chalk .flame { transform-box: fill-box; }
+  .tile:hover .fx-chalk .bob { animation: bob 2.4s ease-in-out var(--del, 0s) infinite alternate; }
+  .fx-chalk .flame { transform-origin: 50% 100%; }
+  .tile:hover .fx-chalk .flame { animation: flicker .32s ease-in-out var(--del, 0s) infinite alternate; }
+  @keyframes bob { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-12px) rotate(2deg); } }
+  @keyframes flicker { from { transform: scale(1, 1) skewX(-4deg); } to { transform: scale(.85, 1.12) skewX(4deg); } }
+
+  /* coming next: dotted placeholder */
+  .tile.next {
+    background: transparent; box-shadow: none;
+    border: 2.5px dashed #9aa39b; border-radius: 12px;
+    display: grid; place-items: center; text-align: center; min-height: 320px;
+  }
+  .tile.next .inner { padding: 32px; }
+  .tile.next h3 { font-family: "Fraunces", serif; font-style: italic; font-weight: 400; font-size: 30px; color: #6b746d; }
+  .tile.next p { margin-top: 10px; font-size: 15px; color: #7d867f; max-width: 26ch; }
+  .tile.next:hover { border-color: var(--grass); }
+  .tile.next:hover h3 { color: var(--grass); }
+  /* on hover, chalk-drawn kit from other sports tumbles in until the card is full (card colour unchanged) */
+  .tile.next { position: relative; overflow: hidden; }
+  .tile.next:focus-within { border-color: var(--grass); }
+  .tile.next .inner { position: relative; z-index: 1; border-radius: 18px; transition: background .45s ease; }
+  .tile.next:hover .inner, .tile.next:focus-within .inner { background: radial-gradient(closest-side, rgba(245,243,236,.95) 60%, rgba(245,243,236,0)); }
+  .tile.next:focus-within h3 { color: var(--grass); }
+  .pile { position: absolute; inset: 0; pointer-events: none; }
+  .toy {
+    position: absolute; width: 58px; height: 58px; margin-left: -6px;
+    fill: none; stroke: #6b746d; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round;
+    opacity: 0; transform: translateY(-760px) rotate(calc(var(--r) * -4));
+    transition: opacity .2s ease, transform 0s .25s;
+  }
+  .tile.next:hover .toy, .tile.next:focus-within .toy {
+    opacity: .45; transform: translateY(0) rotate(var(--r));
+    transition: opacity .15s ease var(--d), transform .8s cubic-bezier(.34,1.25,.55,1) var(--d);
+  }
+  .suggest {
+    display: inline-block; margin-top: 20px; padding: 10px 22px; border-radius: 999px;
+    border: 2px solid var(--grass); color: var(--grass); background: var(--chalk);
+    font-weight: 600; font-size: 14.5px; text-decoration: none;
+    transition: background .2s ease, color .2s ease;
+  }
+  .suggest:hover, .suggest:focus-visible { background: var(--grass); color: #fff; }
+  footer span:last-child { margin-left: auto; }
+
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr 1fr; gap: 28px; } }
+  @media (max-width: 620px) {
+    .grid { grid-template-columns: 1fr; }
+    .games-inner { padding: 64px 24px 72px; }
+    nav { display: none; }
+    header { padding: 18px 24px; }
+    .hero h1 { padding: 0 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile, .fx, .ph img.bg { transition: none; }
+    .tile { opacity: 1; transform: none; }
+    .fx-chalk .d, .fx-chalk .w { transition: none !important; }
+    .toy { transition: opacity .2s ease !important; transform: rotate(var(--r)) !important; }
+    .fx-chalk .bob, .fx-chalk .flame { animation: none !important; }
+  }
+</style>
+<script>
+(function(){try{
+  var c = sessionStorage.getItem('ptColor');
+  if (c && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    sessionStorage.removeItem('ptColor');
+    var st = document.createElement('style'); st.id = 'pt-cover-style';
+    st.textContent = 'html.pt-cover::before{content:\'\';position:fixed;inset:0;background:' + c +
+      ';z-index:300;pointer-events:none;opacity:1;transition:opacity .65s ease}html.pt-cover.pt-reveal::before{opacity:0}';
+    document.head.appendChild(st);
+    document.documentElement.classList.add('pt-cover');
+  } else { sessionStorage.removeItem('ptColor'); }
+  if (sessionStorage.getItem('ptFade')) { sessionStorage.removeItem('ptFade');
+    var f2 = document.createElement('style'); f2.id = 'pt-fade-style';
+    f2.textContent = 'html.pt-fade .hero>*{opacity:0}';
+    document.head.appendChild(f2); document.documentElement.classList.add('pt-fade'); }
+}catch(e){}})();
+</script>
+<style>
+  @media (max-width: 980px) {
+    header { gap: 10px; padding: 5px 6px 5px 16px; }
+    .word { font-size: 16.5px; }
+    .join { padding: 8px 14px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="chalk" filterUnits="userSpaceOnUse" x="-20" y="-20" width="440" height="340">
+    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="wob"/>
+    <feDisplacementMap in="SourceGraphic" in2="wob" scale="3" xChannelSelector="R" yChannelSelector="G" result="line"/>
+    <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="1" seed="9" result="grain"/>
+    <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.75" result="grainA"/>
+    <feComposite in="line" in2="grainA" operator="in"/>
+  </filter>
+</svg>
+
+<header>
+  <span class="word">TMS Activities</span>
+  <nav>
+    <a href="soccer.html">Soccer</a><a href="swimming.html">Swimming</a><a href="tennis.html">Tennis</a><a href="spanish.html">Spanish</a><a href="parties.html">Parties</a><div class="navgroup" tabindex="0">
+      <button class="glabel" type="button">Club</button>
+      <div class="menu"><div>
+        <a href="coaches.html">Coaches</a>
+        <a href="supporters.html">Supporters</a>
+        <a href="faq.html">FAQ</a>
+      </div></div>
+    </div>
+  </nav>
+  <a class="join" href="join.html">Book a trial</a>
+  <button class="navtoggle" type="button" aria-label="Open menu">Menu</button>
+</header>
+
+<section class="hero">
+  <img src="https://tmsactivities.jp/wp-content/uploads/2025/05/WhatsApp-Image-2025-05-18-at-11.03.35.jpeg" alt="TMS players training in Tokyo">
+  <svg class="heroChalk" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <filter id="chalkHero" filterUnits="userSpaceOnUse" x="0" y="0" width="1440" height="900">
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="4" result="wob"/>
+        <feDisplacementMap in="SourceGraphic" in2="wob" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="line"/>
+        <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="11" result="grain"/>
+        <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2 1.7" result="grainA"/>
+        <feComposite in="line" in2="grainA" operator="in" result="chalk"/>
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="soft"/>
+        <feFlood flood-color="#0E1A14" flood-opacity=".55"/>
+        <feComposite in2="soft" operator="in" result="shade"/>
+        <feMerge><feMergeNode in="shade"/><feMergeNode in="chalk"/></feMerge>
+      </filter>
+      <pattern id="hHatch" width="2.4" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+        <line x1="0" y1="0" x2="0" y2="2.4" stroke="#F3F1E8" stroke-width="1.3"/>
+      </pattern>
+    </defs>
+    <g filter="url(#chalkHero)">
+      <!-- shuttlecock: swirls in on a looping line, cork first -->
+      <path id="hShuttle" class="ht go" pathLength="1" style="--del:.3s;--dur:1.6s"
+        d="M1500 70 C1360 40 1220 120 1240 220 C1256 300 1370 300 1372 236 C1374 176 1290 170 1230 230 C1170 290 1110 300 1040 286"/>
+      <g id="hShuttleObj" opacity="0">
+        <set attributeName="opacity" to="1" begin=".3s" fill="freeze"/>
+        <animateMotion dur="1.6s" begin=".3s" fill="freeze" rotate="auto" calcMode="spline" keyPoints="0;1" keyTimes="0;1" keySplines=".3 0 .4 1"><mpath href="#hShuttle"/></animateMotion>
+        <!-- skirt shaded, with a see-through band strip across it -->
+        <mask id="hShuttleMask" maskUnits="userSpaceOnUse" x="-42" y="-22" width="46" height="44">
+          <rect x="-42" y="-22" width="46" height="44" fill="#fff"/>
+          <rect x="-27" y="-22" width="14" height="44" fill="#000"/>
+        </mask>
+        <g mask="url(#hShuttleMask)">
+          <path d="M0 -7 L-36 -18 Q-40 0 -36 18 L0 7 Z" fill="url(#hHatch)"/>
+          <path d="M0 -7 L-36 -18 Q-40 0 -36 18 L0 7 Z" fill="#F3F1E8" fill-opacity=".3"/>
+        </g>
+        <path d="M-1 -8 Q13 -8 13 0 Q13 8 -1 8 Z" fill="#FFFFFF"/>
+        <path d="M0 -7 Q12 -7 12 0 Q12 7 0 7 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2"/>
+        <path class="s" d="M0 -7 Q12 -7 12 0 Q12 7 0 7 Z M0 -7 L-36 -18 M0 7 L-36 18 M-36 -18 Q-40 0 -36 18 M0 -2 L-36 -6 M0 2 L-36 6 M-13 -11 L-13 11 M-27 -15.3 L-27 15.3"/>
+      </g>
+
+      <!-- tennis ball: bounces in from the bottom right in big arcs, freezes at the top of the last one.
+           Timed per segment: speeds up falling into each bounce, slows rising to each peak. Trail is drawn in step. -->
+      <path id="hTennis" class="ht late" pathLength="1"
+        d="M1540 420 Q1480 400 1420 814 Q1310 340 1200 814 Q1150 570 1100 570">
+        <animate attributeName="stroke-dashoffset" begin=".8s" dur="1.8s" fill="freeze" values="1.0000;0.6563;0.4380;0.2196;0.0000" keyTimes="0;.24;.5;.74;1" calcMode="spline" keySplines=".42 0 .9 .55;.1 .45 .58 1;.42 0 .9 .55;.1 .45 .58 1"/>
+      </path>
+      <g id="hTennisObj" opacity="0">
+        <set attributeName="opacity" to="1" begin=".8s" fill="freeze"/>
+        <animateMotion dur="1.8s" begin=".8s" fill="freeze" keyPoints="0.0000;0.3437;0.5620;0.7804;1.0000" keyTimes="0;.24;.5;.74;1" calcMode="spline" keySplines=".42 0 .9 .55;.1 .45 .58 1;.42 0 .9 .55;.1 .45 .58 1"><mpath href="#hTennis"/></animateMotion>
+        <g class="spin">
+          <animateTransform attributeName="transform" type="rotate" from="0" to="-760" dur="1.8s" begin=".8s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".2 .5 .5 1"/>
+          <!-- shade the middle band only; the two side panels outside the seams stay see-through -->
+          <mask id="hTennisMask" maskUnits="userSpaceOnUse" x="-30" y="-30" width="60" height="60">
+            <circle r="27" fill="#fff"/>
+            <path d="M-17 -19 Q-5 0 -17 19 A26 26 0 0 1 -17 -19 Z M17 -19 Q5 0 17 19 A26 26 0 0 0 17 -19 Z" fill="#000"/>
+          </mask>
+          <g mask="url(#hTennisMask)">
+            <circle r="26" fill="url(#hHatch)"/>
+            <circle r="26" fill="#F3F1E8" fill-opacity=".4"/>
+          </g>
+          <circle class="s" r="26"/>
+          <path class="s" d="M-17 -19 Q-5 0 -17 19 M17 -19 Q5 0 17 19"/>
+        </g>
+      </g>
+
+      <!-- football: rolls in from the bottom left, overshoots a touch and rocks back to rest; speed lines stay behind it -->
+      <clipPath id="hBallClip"><circle r="34"/></clipPath>
+      <!-- speed lines ride with the ball: long while it's fast, shrinking as it slows, short once it rests -->
+      <g class="rollx">
+        <g class="speed">
+          <path class="s" d="M-64 -40 h-80 M-70 0 h-120 M-64 40 h-70"/>
+        </g>
+      </g>
+      <g class="roll">
+        <!-- chalk ball like a blackboard sketch: pentagons shaded in, hexagons left open -->
+        <g clip-path="url(#hBallClip)">
+          <path d="M0.0 -11.5 L10.9 -3.6 L6.8 9.3 L-6.8 9.3 L-10.9 -3.6 Z M0.0 -19.5 L-10.0 -26.8 L-6.2 -38.5 L6.2 -38.5 L10.0 -26.8 Z M18.5 -6.0 L22.4 -17.8 L34.7 -17.8 L38.5 -6.0 L28.5 1.2 Z M11.5 15.8 L23.8 15.8 L27.6 27.5 L17.6 34.8 L7.6 27.5 Z M-11.5 15.8 L-7.6 27.5 L-17.6 34.8 L-27.6 27.5 L-23.8 15.8 Z M-18.5 -6.0 L-28.5 1.2 L-38.5 -6.0 L-34.7 -17.8 L-22.4 -17.8 Z" fill="url(#hHatch)"/>
+          <path d="M0.0 -11.5 L10.9 -3.6 L6.8 9.3 L-6.8 9.3 L-10.9 -3.6 Z M0.0 -19.5 L-10.0 -26.8 L-6.2 -38.5 L6.2 -38.5 L10.0 -26.8 Z M18.5 -6.0 L22.4 -17.8 L34.7 -17.8 L38.5 -6.0 L28.5 1.2 Z M11.5 15.8 L23.8 15.8 L27.6 27.5 L17.6 34.8 L7.6 27.5 Z M-11.5 15.8 L-7.6 27.5 L-17.6 34.8 L-27.6 27.5 L-23.8 15.8 Z M-18.5 -6.0 L-28.5 1.2 L-38.5 -6.0 L-34.7 -17.8 L-22.4 -17.8 Z" fill="#F3F1E8" fill-opacity=".5" class="s" style="stroke-width:1.3"/>
+          <path class="s" style="stroke-width:1.3" d="M0.0 -11.5 L0.0 -19.5 M10.9 -3.6 L18.5 -6.0 M6.8 9.3 L11.5 15.8 M-6.8 9.3 L-11.5 15.8 M-10.9 -3.6 L-18.5 -6.0 M10.0 -26.8 L21.7 -29.9 M22.4 -17.8 L21.7 -29.9 M28.5 1.2 L35.2 11.4 M23.8 15.8 L35.2 11.4 M7.6 27.5 L0.0 37.0 M-7.6 27.5 L0.0 37.0 M-23.8 15.8 L-35.2 11.4 M-28.5 1.2 L-35.2 11.4 M-22.4 -17.8 L-21.7 -29.9 M-10.0 -26.8 L-21.7 -29.9"/>
+        </g>
+        <circle class="s" r="34" style="stroke-width:1.8"/>
+      </g>
+    </g>
+  </svg>
+  <div class="heroText">
+    <h1 class="serif">Play it <em>the Spanish way.</em></h1>
+    <p class="deck">Tokyo’s academy for soccer, swimming, tennis and Spanish. Possession, creativity and joy, from Baby School to U18.</p>
+  </div>
+</section>
+
+<section class="games">
+  <div class="games-inner">
+  <h2>Choose <em>your game.</em></h2>
+  <p class="lede">Five programmes, one club. Every one starts with a free trial.</p>
+  <div class="grid">
+
+    <a class="tile t-soccer" href="soccer.html">
+      <div class="ph">
+        <img class="bg" src="https://tmsactivities.jp/wp-content/uploads/2025/03/IMG_6781-1-scaled.jpg" alt="">
+        <div class="fx fx-chalk"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g filter="url(#chalk)">
+          <path class="d" pathLength="1" style="--dur:.7s" d="M400 58 H296 V242 H400"/>
+          <path class="d" pathLength="1" style="--del:.35s;--dur:.35s" d="M400 112 H378 V188 H400"/>
+          <circle class="d" pathLength="1" style="--del:.5s;--dur:.3s" cx="64" cy="232" r="13"/>
+          <circle class="d" pathLength="1" style="--del:.6s;--dur:.3s" cx="182" cy="118" r="13"/>
+          <circle class="d" pathLength="1" style="--del:.7s;--dur:.3s" cx="236" cy="222" r="13"/>
+          <path class="d" pathLength="1" style="--del:.85s;--dur:.25s" d="M140 188 l16 16 M156 188 l-16 16"/>
+          <path class="d" pathLength="1" style="--del:.95s;--dur:.25s" d="M262 128 l16 16 M278 128 l-16 16"/>
+          <path class="d arr" pathLength="1" style="--del:1.15s;--dur:.45s" d="M76 222 Q112 150 166 124"/>
+          <path class="d arr" pathLength="1" style="--del:1.75s;--dur:.4s" d="M192 132 Q232 160 234 202"/>
+          <path class="d arr" pathLength="1" style="--del:2.3s;--dur:.45s" d="M250 214 Q330 214 372 158"/>
+        </g></svg></div>
+      </div>
+      <div class="body">
+        <h3>Soccer</h3>
+        <span class="pill">Ages 2–18</span>
+        <p>The Spanish school of football. Possession, creativity and quick thinking, from Baby School to competition teams.</p>
+      </div>
+    </a>
+
+    <a class="tile t-swim" href="swimming.html">
+      <div class="ph">
+        <img class="bg" src="https://tmsactivities.jp/wp-content/uploads/2025/07/swimming-tms-background.jpeg" alt="">
+        <div class="fx fx-chalk"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g filter="url(#chalk)">
+          <path class="d" pathLength="1" data-rope style="--dur:.6s" d="M0 92 H400"/>
+          <path class="d" pathLength="1" data-rope style="--del:.12s;--dur:.6s" d="M0 168 H400"/>
+          <path class="d" pathLength="1" data-rope style="--del:.24s;--dur:.6s" d="M0 244 H400"/>
+          <path class="d" pathLength="1" style="--del:.45s;--dur:.35s" d="M352 66 V270"/>
+          <path class="d arr" pathLength="1" style="--del:.8s;--dur:1.1s" d="M24 130 q13 -12 26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 L340 130"/>
+          <text class="w" style="--del:1.9s;--dur:.6s" x="252" y="220" font-size="40">25 m</text>
+        </g></svg></div>
+      </div>
+      <div class="body">
+        <h3>Swimming</h3>
+        <span class="pill">All ages</span>
+        <p>From losing the fear of water to proper strokes. Private lessons and small groups at the Hommura pool.</p>
+      </div>
+    </a>
+
+    <a class="tile t-tennis" href="tennis.html">
+      <div class="ph">
+        <img class="bg" src="https://tmsactivities.jp/wp-content/uploads/2025/08/tennis-lessons-tms.jpg" alt="">
+        <div class="fx fx-chalk"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g filter="url(#chalk)">
+          <path class="d" pathLength="1" style="--dur:.8s" d="M40 276 L112 52 H288 L360 276 Z"/>
+          <path class="d" pathLength="1" style="--del:.5s;--dur:.3s" d="M98 96 H302"/>
+          <path class="d" pathLength="1" style="--del:.6s;--dur:.3s" d="M60 214 H340"/>
+          <path class="d" pathLength="1" style="--del:.7s;--dur:.3s" d="M200 96 V214"/>
+          <path class="d net" pathLength="1" style="--del:.85s;--dur:.35s" d="M70 145 H330"/>
+          <path class="d arr" pathLength="1" style="--del:1.2s;--dur:.55s" d="M150 262 Q150 40 246 80"/>
+          <path class="d" pathLength="1" style="--del:1.85s;--dur:.2s" d="M246 70 l12 12 M258 70 l-12 12"/>
+          <path class="d arr" pathLength="1" style="--del:2.1s;--dur:.5s" d="M262 84 Q310 150 296 238"/>
+        </g></svg></div>
+      </div>
+      <div class="body">
+        <h3>Tennis</h3>
+        <span class="pill">Ages 6+ &amp; adults</span>
+        <p>Kids' classes, adult groups and women's cardio tennis at Nishimachi International School.</p>
+      </div>
+    </a>
+
+    <a class="tile t-spanish" href="spanish.html">
+      <div class="ph">
+        <img class="bg" src="https://tmsactivities.jp/wp-content/uploads/2025/07/children-learning-spanish.jpg" alt="">
+        <div class="fx fx-chalk"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g filter="url(#chalk)">
+          <path class="d" pathLength="1" style="--dur:.6s" d="M48 40 H198 Q218 40 218 60 V100 Q218 120 198 120 H90 L58 146 L66 120 H48 Q28 120 28 100 V60 Q28 40 48 40 Z"/>
+          <text class="w" style="--del:.5s;--dur:.6s" x="123" y="97" text-anchor="middle" font-size="52">¡Hola!</text>
+          <path class="d" pathLength="1" style="--del:1.15s;--dur:.6s" d="M192 162 H352 Q372 162 372 182 V218 Q372 238 352 238 H336 L344 264 L310 238 H192 Q172 238 172 218 V182 Q172 162 192 162 Z"/>
+          <text class="w" style="--del:1.65s;--dur:.65s" x="272" y="214" text-anchor="middle" font-size="44">¿Qué tal?</text>
+        </g></svg></div>
+      </div>
+      <div class="body">
+        <h3>Spanish</h3>
+        <span class="pill">All ages</span>
+        <p>Private classes with DELE-certified teachers. And Spanish-and-soccer sessions on the pitch.</p>
+      </div>
+    </a>
+
+    <a class="tile t-party" href="parties.html">
+      <div class="ph">
+        <img class="bg" src="https://tmsactivities.jp/wp-content/uploads/2025/07/children-party.jpg" alt="">
+        <div class="fx fx-chalk"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g filter="url(#chalk)">
+          <path class="d" pathLength="1" style="--dur:.4s" d="M108 266 H292"/>
+          <path class="d" pathLength="1" style="--del:.2s;--dur:.45s" d="M134 264 V212 H266 V264"/>
+          <path class="d" pathLength="1" style="--del:.55s;--dur:.4s" d="M134 224 q11 12 22 0 t22 0 t22 0 t22 0 t22 0 t22 0"/>
+          <path class="d" pathLength="1" style="--del:.8s;--dur:.4s" d="M158 212 V172 H242 V212"/>
+          <path class="d" pathLength="1" style="--del:1.1s;--dur:.3s" d="M158 182 q10.5 10 21 0 t21 0 t21 0 t21 0"/>
+          <path class="d" pathLength="1" style="--del:1.3s;--dur:.3s" d="M180 172 V150 M200 172 V146 M220 172 V150"/>
+          <g style="--del:1.7s">
+            <path class="d flame" pathLength="1" style="--del:1.6s;--dur:.2s" d="M180 143 q-6 -8 0 -17 q6 9 0 17 Z"/>
+            <path class="d flame" pathLength="1" style="--del:1.68s;--dur:.2s" d="M200 139 q-6 -8 0 -17 q6 9 0 17 Z"/>
+            <path class="d flame" pathLength="1" style="--del:1.76s;--dur:.2s" d="M220 143 q-6 -8 0 -17 q6 9 0 17 Z"/>
+          </g>
+          <g class="bob" style="--del:2.5s">
+            <path class="d" pathLength="1" style="--del:1.9s;--dur:.5s" d="M70 40 c16 0 24 14 24 28 c0 16 -12 26 -24 26 c-12 0 -24 -10 -24 -26 c0 -14 8 -28 24 -28 Z"/>
+            <path class="d" pathLength="1" style="--del:2.35s;--dur:.45s" d="M70 94 l-4 6 h8 z M70 100 q-10 20 4 40 t-2 40"/>
+          </g>
+          <g class="bob" style="--del:2.7s">
+            <path class="d" pathLength="1" style="--del:2.1s;--dur:.5s" d="M330 56 c16 0 24 14 24 28 c0 16 -12 26 -24 26 c-12 0 -24 -10 -24 -26 c0 -14 8 -28 24 -28 Z"/>
+            <path class="d" pathLength="1" style="--del:2.5500000000000003s;--dur:.45s" d="M330 110 l-4 6 h8 z M330 116 q-10 20 4 40 t-2 40"/>
+          </g>
+          <path class="d" pathLength="1" style="--del:2.6s;--dur:.3s" d="M120 120 l6 -9 M282 128 l-7 -6 M150 70 l-4 -9 M252 76 l5 -8"/>
+        </g></svg></div>
+      </div>
+      <div class="body">
+        <h3>Birthday parties</h3>
+        <span class="pill">All ages</span>
+        <p>Games, laughter and friends. We make the special day unforgettable.</p>
+      </div>
+    </a>
+
+    <div class="tile next" tabindex="0">
+      <div class="pile">
+        <svg class="toy" style="left:-1.9%;bottom:-1.0%;--r:13deg;--d:0.00s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M4 32 H60 M32 4 V60 M13 11 Q27 32 13 53 M51 11 Q37 32 51 53"/></g></svg>
+        <svg class="toy" style="left:20.1%;bottom:-1.2%;--r:9deg;--d:0.03s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="26" cy="26" r="19"/><path d="M39 39 L55 55" stroke-width="7"/><circle cx="53" cy="13" r="5"/></g></svg>
+        <svg class="toy" style="left:38.0%;bottom:-1.4%;--r:-1deg;--d:0.07s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M12 8 H30 V28 Q46 28 53 36 V44 H12 Z M18 16 h8 M18 22 h8 M6 54 H58 Q60 50 56 50 M18 44 V54 M46 44 V54"/></g></svg>
+        <svg class="toy" style="left:56.2%;bottom:0.2%;--r:-25deg;--d:0.11s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="26"/><path d="M15 13 Q26 32 15 51 M49 13 Q38 32 49 51 M17 20 l5 -2 M20 28 l5 -1 M20 36 l5 1 M17 44 l5 2 M47 20 l-5 -2 M44 28 l-5 -1 M44 36 l-5 1 M47 44 l-5 2"/></g></svg>
+        <svg class="toy" style="left:75.1%;bottom:-0.8%;--r:12deg;--d:0.12s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M4 29 Q4 23 10 23 H54 Q60 23 60 29 Q60 33 54 33 H10 Q4 33 4 29 Z"/><circle cx="17" cy="42" r="5"/><circle cx="47" cy="42" r="5"/></g></svg>
+        <svg class="toy" style="left:2.8%;bottom:12.7%;--r:-25deg;--d:0.13s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M32 32 C30 18 36 9 47 6 M32 32 C44 38 54 37 60 29 M32 32 C24 43 23 52 26 59 M32 4 C22 12 18 22 20 34 M8 46 C18 46 26 42 32 32"/></g></svg>
+        <svg class="toy" style="left:22.2%;bottom:13.5%;--r:-10deg;--d:0.13s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="24" cy="22" rx="14" ry="18" transform="rotate(-42 24 22)"/><path d="M14 14 L33 31 M18 9 L37 26 M11 21 L28 37 M16 31 L33 13 M10 26 L28 8 M23 35 L38 19 M34 33 L56 57"/></g></svg>
+        <svg class="toy" style="left:44.2%;bottom:12.6%;--r:7deg;--d:0.17s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="28" cy="46" r="11"/><path d="M44 6 V44 M44 6 L59 13 L44 20 M38 50 Q44 56 54 54"/></g></svg>
+        <svg class="toy" style="left:61.9%;bottom:12.6%;--r:12deg;--d:0.17s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M7 53 L11 57 L45 29 Q60 17 56 9 Q49 4 37 18 Z M7 53 L4 56 M11 57 L8 60"/></g></svg>
+        <svg class="toy" style="left:81.0%;bottom:13.0%;--r:8deg;--d:0.19s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M42 4 L23 49 Q20 56 13 56 H4"/><ellipse cx="50" cy="54" rx="10" ry="4.5"/></g></svg>
+        <svg class="toy" style="left:-2.5%;bottom:25.3%;--r:-1deg;--d:0.21s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="32" cy="32" rx="29" ry="17" transform="rotate(-32 32 32)"/><path d="M13 44 Q32 26 51 20 M27 31 l5 5 M31 28 l5 5 M35 25 l5 5"/></g></svg>
+        <svg class="toy" style="left:18.3%;bottom:26.1%;--r:-5deg;--d:0.22s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="32" cy="34" rx="28" ry="11"/><ellipse cx="32" cy="31" rx="17" ry="5"/></g></svg>
+        <svg class="toy" style="left:39.5%;bottom:25.4%;--r:-13deg;--d:0.23s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M4 32 H60 M32 4 V60 M13 11 Q27 32 13 53 M51 11 Q37 32 51 53"/></g></svg>
+        <svg class="toy" style="left:56.5%;bottom:24.8%;--r:-7deg;--d:0.28s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="26" cy="26" r="19"/><path d="M39 39 L55 55" stroke-width="7"/><circle cx="53" cy="13" r="5"/></g></svg>
+        <svg class="toy" style="left:75.9%;bottom:26.2%;--r:-21deg;--d:0.30s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M12 8 H30 V28 Q46 28 53 36 V44 H12 Z M18 16 h8 M18 22 h8 M6 54 H58 Q60 50 56 50 M18 44 V54 M46 44 V54"/></g></svg>
+        <svg class="toy" style="left:3.3%;bottom:36.7%;--r:3deg;--d:0.29s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="26"/><path d="M15 13 Q26 32 15 51 M49 13 Q38 32 49 51 M17 20 l5 -2 M20 28 l5 -1 M20 36 l5 1 M17 44 l5 2 M47 20 l-5 -2 M44 28 l-5 -1 M44 36 l-5 1 M47 44 l-5 2"/></g></svg>
+        <svg class="toy" style="left:26.8%;bottom:35.9%;--r:7deg;--d:0.32s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M4 29 Q4 23 10 23 H54 Q60 23 60 29 Q60 33 54 33 H10 Q4 33 4 29 Z"/><circle cx="17" cy="42" r="5"/><circle cx="47" cy="42" r="5"/></g></svg>
+        <svg class="toy" style="left:45.9%;bottom:36.6%;--r:16deg;--d:0.33s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M32 32 C30 18 36 9 47 6 M32 32 C44 38 54 37 60 29 M32 32 C24 43 23 52 26 59 M32 4 C22 12 18 22 20 34 M8 46 C18 46 26 42 32 32"/></g></svg>
+        <svg class="toy" style="left:63.5%;bottom:38.1%;--r:-24deg;--d:0.38s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="24" cy="22" rx="14" ry="18" transform="rotate(-42 24 22)"/><path d="M14 14 L33 31 M18 9 L37 26 M11 21 L28 37 M16 31 L33 13 M10 26 L28 8 M23 35 L38 19 M34 33 L56 57"/></g></svg>
+        <svg class="toy" style="left:85.2%;bottom:37.1%;--r:14deg;--d:0.37s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="28" cy="46" r="11"/><path d="M44 6 V44 M44 6 L59 13 L44 20 M38 50 Q44 56 54 54"/></g></svg>
+        <svg class="toy" style="left:0.2%;bottom:49.0%;--r:8deg;--d:0.40s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M7 53 L11 57 L45 29 Q60 17 56 9 Q49 4 37 18 Z M7 53 L4 56 M11 57 L8 60"/></g></svg>
+        <svg class="toy" style="left:20.1%;bottom:49.0%;--r:-4deg;--d:0.42s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M42 4 L23 49 Q20 56 13 56 H4"/><ellipse cx="50" cy="54" rx="10" ry="4.5"/></g></svg>
+        <svg class="toy" style="left:37.2%;bottom:50.9%;--r:-6deg;--d:0.42s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="32" cy="32" rx="29" ry="17" transform="rotate(-32 32 32)"/><path d="M13 44 Q32 26 51 20 M27 31 l5 5 M31 28 l5 5 M35 25 l5 5"/></g></svg>
+        <svg class="toy" style="left:55.6%;bottom:48.3%;--r:21deg;--d:0.45s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="32" cy="34" rx="28" ry="11"/><ellipse cx="32" cy="31" rx="17" ry="5"/></g></svg>
+        <svg class="toy" style="left:78.2%;bottom:49.3%;--r:27deg;--d:0.48s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M4 32 H60 M32 4 V60 M13 11 Q27 32 13 53 M51 11 Q37 32 51 53"/></g></svg>
+        <svg class="toy" style="left:3.3%;bottom:61.7%;--r:-11deg;--d:0.49s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="26" cy="26" r="19"/><path d="M39 39 L55 55" stroke-width="7"/><circle cx="53" cy="13" r="5"/></g></svg>
+        <svg class="toy" style="left:26.1%;bottom:63.1%;--r:-11deg;--d:0.50s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M12 8 H30 V28 Q46 28 53 36 V44 H12 Z M18 16 h8 M18 22 h8 M6 54 H58 Q60 50 56 50 M18 44 V54 M46 44 V54"/></g></svg>
+        <svg class="toy" style="left:46.4%;bottom:62.5%;--r:-4deg;--d:0.54s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="26"/><path d="M15 13 Q26 32 15 51 M49 13 Q38 32 49 51 M17 20 l5 -2 M20 28 l5 -1 M20 36 l5 1 M17 44 l5 2 M47 20 l-5 -2 M44 28 l-5 -1 M44 36 l-5 1 M47 44 l-5 2"/></g></svg>
+        <svg class="toy" style="left:61.8%;bottom:61.0%;--r:-14deg;--d:0.55s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M4 29 Q4 23 10 23 H54 Q60 23 60 29 Q60 33 54 33 H10 Q4 33 4 29 Z"/><circle cx="17" cy="42" r="5"/><circle cx="47" cy="42" r="5"/></g></svg>
+        <svg class="toy" style="left:80.6%;bottom:63.0%;--r:-17deg;--d:0.56s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M32 32 C30 18 36 9 47 6 M32 32 C44 38 54 37 60 29 M32 32 C24 43 23 52 26 59 M32 4 C22 12 18 22 20 34 M8 46 C18 46 26 42 32 32"/></g></svg>
+        <svg class="toy" style="left:-3.5%;bottom:74.2%;--r:-5deg;--d:0.56s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="24" cy="22" rx="14" ry="18" transform="rotate(-42 24 22)"/><path d="M14 14 L33 31 M18 9 L37 26 M11 21 L28 37 M16 31 L33 13 M10 26 L28 8 M23 35 L38 19 M34 33 L56 57"/></g></svg>
+        <svg class="toy" style="left:17.6%;bottom:73.3%;--r:26deg;--d:0.59s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="28" cy="46" r="11"/><path d="M44 6 V44 M44 6 L59 13 L44 20 M38 50 Q44 56 54 54"/></g></svg>
+        <svg class="toy" style="left:38.6%;bottom:74.9%;--r:-25deg;--d:0.61s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M7 53 L11 57 L45 29 Q60 17 56 9 Q49 4 37 18 Z M7 53 L4 56 M11 57 L8 60"/></g></svg>
+        <svg class="toy" style="left:59.4%;bottom:75.8%;--r:15deg;--d:0.65s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M42 4 L23 49 Q20 56 13 56 H4"/><ellipse cx="50" cy="54" rx="10" ry="4.5"/></g></svg>
+        <svg class="toy" style="left:76.5%;bottom:74.1%;--r:-22deg;--d:0.66s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="32" cy="32" rx="29" ry="17" transform="rotate(-32 32 32)"/><path d="M13 44 Q32 26 51 20 M27 31 l5 5 M31 28 l5 5 M35 25 l5 5"/></g></svg>
+        <svg class="toy" style="left:4.5%;bottom:85.9%;--r:-15deg;--d:0.65s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><ellipse cx="32" cy="34" rx="28" ry="11"/><ellipse cx="32" cy="31" rx="17" ry="5"/></g></svg>
+        <svg class="toy" style="left:22.5%;bottom:87.1%;--r:-22deg;--d:0.66s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="28"/><path d="M4 32 H60 M32 4 V60 M13 11 Q27 32 13 53 M51 11 Q37 32 51 53"/></g></svg>
+        <svg class="toy" style="left:42.3%;bottom:85.6%;--r:-5deg;--d:0.70s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="26" cy="26" r="19"/><path d="M39 39 L55 55" stroke-width="7"/><circle cx="53" cy="13" r="5"/></g></svg>
+        <svg class="toy" style="left:61.4%;bottom:85.9%;--r:-4deg;--d:0.71s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M12 8 H30 V28 Q46 28 53 36 V44 H12 Z M18 16 h8 M18 22 h8 M6 54 H58 Q60 50 56 50 M18 44 V54 M46 44 V54"/></g></svg>
+        <svg class="toy" style="left:81.8%;bottom:86.3%;--r:-5deg;--d:0.75s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="26"/><path d="M15 13 Q26 32 15 51 M49 13 Q38 32 49 51 M17 20 l5 -2 M20 28 l5 -1 M20 36 l5 1 M17 44 l5 2 M47 20 l-5 -2 M44 28 l-5 -1 M44 36 l-5 1 M47 44 l-5 2"/></g></svg>
+      </div>
+      <div class="inner">
+        <h3>Coming next…</h3>
+        <p>New programmes join the club every season. Tell us what your kids want to play.</p>
+        <a class="suggest" href="#suggest">Suggest a sport</a>
+      </div>
+    </div>
+
+  </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="fcta">
+      <h2>The first session is <em>always free.</em></h2>
+      <a href="join.html">Book a free trial</a>
+    </div>
+    <div class="fgrid">
+      <div class="fcol brand">
+        <span class="fword">TMS Activities</span>
+        <p>Education through sport, the Spanish way. In the heart of Tokyo since 2021.</p>
+        <p class="contact" style="margin-top:14px; line-height:1.9"><a href="tel:+818089162274">+81 80-8916-2274</a><br><a href="mailto:Spainupacademy@gmail.com">Spainupacademy@gmail.com</a></p>
+      </div>
+      <div class="fcol">
+        <h5>Programmes</h5>
+        <a href="soccer.html">Soccer</a>
+        <a href="swimming.html">Swimming</a>
+        <a href="tennis.html">Tennis</a>
+        <a href="spanish.html">Spanish</a>
+        <a href="parties.html">Birthday parties</a>
+      </div>
+      <div class="fcol">
+        <h5>The club</h5>
+        <a href="coaches.html">Coaches</a>
+        <a href="supporters.html">Supporters</a>
+        <a href="faq.html">FAQ</a>
+        <a href="join.html">Join us</a>
+      </div>
+      <div class="fcol sup">
+        <h5>Our supporters</h5>
+        <div class="flogos">
+          <a href="https://kelme.com/" target="_blank" rel="noopener"><span class="chip"><img src="https://tmsactivities.jp/wp-content/uploads/2024/01/logo-kelme-300x164.jpg" alt="Kelme"></span><span class="cap">Kelme</span></a>
+          <a href="https://www.issh.ac.jp/" target="_blank" rel="noopener"><span class="chip"><img src="https://tmsactivities.jp/wp-content/uploads/2025/08/Logo-ISSH-200px.png" alt="Sacred Heart"></span><span class="cap">Sacred Heart</span></a>
+          <a href="https://yoyogi-is.com/" target="_blank" rel="noopener"><span class="chip"><img src="https://tmsactivities.jp/wp-content/uploads/2025/08/Logo-Yoyogi-200px.png" alt="Yoyogi Int’l"></span><span class="cap">Yoyogi Int’l</span></a>
+          <a href="https://www.js-international-school.com/" target="_blank" rel="noopener"><span class="chip"><img src="https://tmsactivities.jp/wp-content/uploads/2025/08/Js-logo.png" alt="J’s Int’l"></span><span class="cap">J’s Int’l</span></a>
+          <a href="https://www.montessorijapan.com/" target="_blank" rel="noopener"><span class="chip" style="background:#76805E"><img src="assets/mst-logo-white.png" alt="Montessori Tokyo"></span><span class="cap">Montessori Tokyo</span></a>
+          <a href="https://www.gohesive.com/custom" target="_blank" rel="noopener"><span class="chip"><img src="assets/gohesive-logo.svg" alt="Gohesive"></span><span class="cap">Gohesive</span></a>
+        </div>
+        <p>Club members get 15% off all Kelme gear.</p>
+      </div>
+    </div>
+    <div class="fbase">
+      <span>© Spain Up Academy</span>
+      <span>Tokyo · est. 2021</span>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        const tiles = [...document.querySelectorAll('.tile')];
+        const i = tiles.indexOf(e.target);
+        setTimeout(() => e.target.classList.add('in'), (i % 3) * 120);
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.18 });
+  document.querySelectorAll('.tile').forEach(t => io.observe(t));
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('.heroChalk').setCurrentTime(10);
+  /* hero chalk, after the intro: nudge a ball or the shuttle and it rolls / bounces / flies away; hold-click to drag and throw */
+  (() => {
+    const svg = document.querySelector('.heroChalk'), hero = document.querySelector('.hero');
+    if (!svg || !hero || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover)').matches) return;
+    const t0 = performance.now(), FLOOR = 840;
+    const strip = (g) => g.querySelectorAll(':scope > set, :scope > animateMotion, :scope > g > animateTransform').forEach(a => a.remove());
+    const shuttlePath = document.getElementById('hShuttle'), sp = shuttlePath.getTotalLength();
+    const sEnd = shuttlePath.getPointAtLength(sp), sPrev = shuttlePath.getPointAtLength(sp - 4);
+    const objs = [
+      { kind: 'shuttle', el: document.getElementById('hShuttleObj'), ready: 1.95, r: 30,
+        x: sEnd.x, y: sEnd.y, vx: 0, vy: 0, a: Math.atan2(sEnd.y - sPrev.y, sEnd.x - sPrev.x) },
+      { kind: 'tennis', el: document.getElementById('hTennisObj'), ready: 2.65, r: 26, x: 1100, y: 570, vx: 0, vy: 0, rot: -760 * Math.PI / 180 },
+      { kind: 'football', el: document.querySelector('.heroChalk .roll'), ready: 3.25, r: 54, x: 300, y: 770, vx: 0, vy: 0, rot: 0,
+        lines: document.querySelector('.heroChalk .rollx'), speed: document.querySelector('.heroChalk .speed') },
+    ];
+    const take = (o) => {
+      if (o.live) return; o.live = true;
+      if (o.kind === 'football') { [o.el, o.lines, o.speed].forEach(e => e.style.animation = 'none'); }
+      else { strip(o.el); o.el.setAttribute('opacity', '1'); }
+      // once it's in play, its intro chalk lines rub out
+      const trail = o.kind === 'football' ? o.lines : document.getElementById(o.kind === 'shuttle' ? 'hShuttle' : 'hTennis');
+      trail.animate([{ opacity: getComputedStyle(trail).opacity }, { opacity: 0 }], { duration: 500, easing: 'ease-out', fill: 'forwards' });
+    };
+    const draw = (o) => {
+      if (o.kind === 'shuttle') o.el.setAttribute('transform', `translate(${o.x.toFixed(1)} ${o.y.toFixed(1)}) rotate(${(o.a * 57.3).toFixed(1)})`);
+      if (o.kind === 'tennis') { o.el.setAttribute('transform', `translate(${o.x.toFixed(1)} ${o.y.toFixed(1)})`); o.el.querySelector('.spin').setAttribute('transform', `rotate(${(o.rot * 57.3).toFixed(1)})`); }
+      if (o.kind === 'football') {
+        o.el.style.transform = `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) rotate(${(o.rot * 57.3).toFixed(1)}deg) scale(1.6)`;
+        const dir = o.vx < 0 ? -1 : 1;
+        if (Math.abs(o.vx) > 1) o.dir = dir;
+        o.lines.style.transform = `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) scale(${o.dir || 1}, 1)`;
+        o.speed.style.transform = `scaleX(${Math.min(1.5, .3 + Math.abs(o.vx) / 500).toFixed(2)})`;
+      }
+    };
+    const toView = (e) => { const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return p; };
+    const bounds = () => { const r = hero.getBoundingClientRect(), m = svg.getScreenCTM().inverse();
+      return { l: new DOMPoint(r.left, 0).matrixTransform(m).x, r: new DOMPoint(r.right, 0).matrixTransform(m).x, t: new DOMPoint(0, Math.max(r.top, 0)).matrixTransform(m).y }; };
+
+    let raf = 0, last = 0, prevPt = null, prevT = 0, held = null, grab = null;
+    const step = (now) => {
+      const dt = Math.min(.033, (now - last) / 1000); last = now;
+      const b = bounds(); let moving = false;
+      for (const o of objs) {
+        if (!o.live || o.rest || o === held) continue;
+        if (o.kind === 'football') {
+          const fy = 770, grounded = o.y >= fy && !o.vy;
+          if (!grounded) { o.vy += 1800 * dt; o.y += o.vy * dt; if (o.y > fy) { o.y = fy; o.vy = -o.vy * .45; if (Math.abs(o.vy) < 90) o.vy = 0; } }
+          if (o.y >= fy && !o.vy) { const f = 520 * dt; o.vx = Math.abs(o.vx) <= f ? 0 : o.vx - Math.sign(o.vx) * f; }
+          o.x += o.vx * dt; o.rot += o.vx * dt / o.r;
+          if (o.x < b.l + o.r) { o.x = b.l + o.r; o.vx = Math.abs(o.vx) * .6; }
+          if (o.x > b.r - o.r) { o.x = b.r - o.r; o.vx = -Math.abs(o.vx) * .6; }
+          if (o.y < b.t + o.r) { o.y = b.t + o.r; o.vy = Math.abs(o.vy) * .5; }
+          if (!o.vx && !o.vy && o.y >= fy) o.rest = true;
+        } else if (o.kind === 'tennis') {
+          o.vy += 1800 * dt; o.x += o.vx * dt; o.y += o.vy * dt; o.rot += o.vx * dt / o.r;
+          const fy = FLOOR - o.r;
+          if (o.y > fy) { o.y = fy; o.vy = -o.vy * .72; o.vx *= .9; if (Math.abs(o.vy) < 60) o.vy = 0; }
+          if (o.y >= fy && !o.vy) { o.vx *= Math.exp(-2.5 * dt); if (Math.abs(o.vx) < 4) o.rest = true; }
+          if (o.x < b.l + o.r) { o.x = b.l + o.r; o.vx = Math.abs(o.vx) * .7; }
+          if (o.x > b.r - o.r) { o.x = b.r - o.r; o.vx = -Math.abs(o.vx) * .7; }
+          if (o.y < b.t + o.r) { o.y = b.t + o.r; o.vy = Math.abs(o.vy) * .5; }
+        } else {
+          // shuttle: heavy drag, light gravity, always flies cork-first along its velocity
+          const k = Math.exp(-1.6 * dt); o.vx *= k; o.vy = o.vy * k + 520 * dt;
+          o.x += o.vx * dt; o.y += o.vy * dt;
+          const target = Math.atan2(o.vy, o.vx); let d = target - o.a;
+          d = Math.atan2(Math.sin(d), Math.cos(d)); o.a += d * Math.min(1, 9 * dt);
+          if (o.x < b.l + 14) { o.x = b.l + 14; o.vx = Math.abs(o.vx) * .4; }
+          if (o.x > b.r - 14) { o.x = b.r - 14; o.vx = -Math.abs(o.vx) * .4; }
+          if (o.y < b.t + 14) { o.y = b.t + 14; o.vy = Math.abs(o.vy) * .4; }
+          if (o.y > FLOOR - 12) { o.y = FLOOR - 12; o.vx = 0; o.vy = 0; o.rest = true; }
+        }
+        draw(o); if (!o.rest) moving = true;
+      }
+      raf = moving || held ? requestAnimationFrame(step) : 0;
+    };
+    const hitAt = (p, t) => objs.find(o => t >= o.ready && Math.hypot(o.x - p.x, o.y - p.y) <= o.r + 16);
+    const kick = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); } };
+    // hold-click to pick one up and drag it; let go to throw it with the drag's speed
+    hero.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      const p = toView(e), o = hitAt(p, (performance.now() - t0) / 1000);
+      if (!o) return;
+      e.preventDefault(); hero.setPointerCapture(e.pointerId);
+      take(o); held = o; o.rest = false; o.vx = o.vy = 0;
+      grab = { dx: o.x - p.x, dy: o.y - p.y, px: p.x, py: p.y, pt: performance.now() };
+      hero.style.cursor = 'grabbing'; kick();
+    });
+    const drop = () => {
+      if (!held) return;
+      const cap = 2200, v = Math.hypot(held.vx, held.vy);
+      if (v > cap) { held.vx *= cap / v; held.vy *= cap / v; }
+      held.rest = false; held = null; grab = null; hero.style.cursor = ''; kick();
+    };
+    hero.addEventListener('pointerup', drop); hero.addEventListener('pointercancel', drop);
+    hero.addEventListener('pointermove', (e) => {
+      const now = performance.now(), t = (now - t0) / 1000, p = toView(e);
+      if (held) {
+        const dts = Math.max(.008, (now - grab.pt) / 1000);
+        held.vx = held.vx * .5 + (p.x - grab.px) / dts * .5; held.vy = held.vy * .5 + (p.y - grab.py) / dts * .5;
+        grab.px = p.x; grab.py = p.y; grab.pt = now;
+        held.x = p.x + grab.dx; held.y = Math.min(p.y + grab.dy, held.kind === 'football' ? 770 : FLOOR - held.r);
+        if (held.kind === 'shuttle') held.a += (Math.PI / 2 - held.a) * .15;
+        if (held.kind !== 'shuttle') held.rot += (p.x - (prevPt ? prevPt.x : p.x)) / held.r;
+        prevPt = p; prevT = now; draw(held); return;
+      }
+      hero.style.cursor = hitAt(p, t) ? 'grab' : '';
+      let cs = 0;
+      if (prevPt && now - prevT < 80) cs = Math.hypot(p.x - prevPt.x, p.y - prevPt.y) / ((now - prevT) / 1000);
+      prevPt = p; prevT = now;
+      for (const o of objs) {
+        if (t < o.ready || now - (o.hitAt || 0) < 160) continue;
+        const dx = o.x - p.x, dy = o.y - p.y, d = Math.hypot(dx, dy);
+        if (d > o.r + 16) continue;
+        take(o); o.rest = false; o.hitAt = now;
+        const nx = d ? dx / d : 1, ny = d ? dy / d : 0, push = Math.min(1500, 650 + cs * .5);
+        if (o.kind === 'football') o.vx += (nx >= 0 ? 1 : -1) * push;
+        else if (o.kind === 'tennis') { o.vx += nx * push * .7; o.vy += Math.min(ny, -.35) * push * .8; }
+        else { o.vx += nx * push * 1.1; o.vy += ny * push * 1.1 - 200; }
+      }
+      if (objs.some(o => o.live && !o.rest)) kick();
+    });
+  })();
+
+  /* ---------- chalk: generated pieces (arrowheads, rope floats) ---------- */
+  const NS = 'http://www.w3.org/2000/svg';
+  const timing = (el) => ({ del: parseFloat(el.style.getPropertyValue('--del')) || 0, dur: parseFloat(el.style.getPropertyValue('--dur')) || .6 });
+  const addStroke = (after, d, del, dur) => {
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('class', 'd'); p.setAttribute('pathLength', '1'); p.setAttribute('d', d);
+    p.style.setProperty('--del', del + 's'); p.style.setProperty('--dur', dur + 's');
+    after.after(p);
+  };
+  document.querySelectorAll('.fx-chalk .arr').forEach(el => {
+    const L = el.getTotalLength(), p1 = el.getPointAtLength(L), p0 = el.getPointAtLength(L - 8);
+    const a = Math.atan2(p1.y - p0.y, p1.x - p0.x), s = 13;
+    const pt = (k) => `${(p1.x + s * Math.cos(a + k)).toFixed(1)} ${(p1.y + s * Math.sin(a + k)).toFixed(1)}`;
+    const { del, dur } = timing(el);
+    addStroke(el, `M${pt(2.6)} L${p1.x.toFixed(1)} ${p1.y.toFixed(1)} L${pt(-2.6)}`, del + dur, .18);
+  });
+  document.querySelectorAll('.fx-chalk [data-rope]').forEach(el => {
+    const y = el.getPointAtLength(0).y; let d = '';
+    for (let x = 11; x < 400; x += 22) d += `M${x} ${y - 5} v10 `;
+    const { del, dur } = timing(el);
+    addStroke(el, d, del + .15, dur);
+  });
+</script>
+
+<script src="transitions.js" defer></script>
+</body>
+</html>
