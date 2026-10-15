@@ -1265,7 +1265,7 @@ window.TMS_T = {
  "Suggest a club": ["クラブを提案する", "Propón un club"],
  "Sign up": ["申し込む", "Inscríbete"],
  "See our past clubs": ["過去のクラブを見る", "Ver clubs anteriores"],
- "Every so often we run a shorter club, usually because a family asked, and open it to everyone. If your kids miss one, or have something new they’d love to try, let us know.": ["ご家族からのリクエストをきっかけに、どなたでも参加できる短期クラブを開くことがあります。また参加したいクラブや、お子さまが挑戦してみたいことがあれば、ぜひ教えてください。", "De vez en cuando organizamos un club más corto, normalmente porque una familia lo pidió, y lo abrimos a todos. Si tus hijos echan de menos alguno, o quieren probar algo nuevo, cuéntanoslo."],
+ "Our short clubs often start with a parent’s suggestion, and they’re open to everyone. If there’s enough interest we’ll gladly run one again, or try something your kids are curious about.": ["短期クラブの多くは、保護者の方からのご提案がきっかけで始まり、どなたでも参加できます。ご希望が集まれば、また開いたり、お子さまが興味を持っている新しいことに挑戦したりするのも大歓迎です。", "Nuestros clubs cortos suelen nacer de la sugerencia de algún padre o madre, y están abiertos a todos. Si hay suficiente interés, con gusto repetimos uno o probamos algo que despierte la curiosidad de tus hijos."],
  "Tap one to ask for it back": ["タップしてまた開いてほしいと伝える", "Toca uno para pedir que vuelva"],
  "Back": ["戻る", "Volver"],
  "Chess": ["チェス", "Ajedrez"],
