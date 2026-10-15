@@ -376,14 +376,14 @@
         if (f.t < 0) continue;
         if (!f.landed) {
           f.vy = Math.min(f.vy + 300 * dt, f.max); f.y += f.vy * dt; f.x += (Math.sin(f.t * f.sw) * f.dr) * dt; f.a += f.va * dt;
-          if (floor < H + 40 && f.y + f.h > floor && f.y + f.h < floor + 60) { f.landed = f.t; f.y = floor - f.h; f.a0 = f.a; f.lie = -(66 + Math.random() * 18); }   // tips over pole-first, so the cloth ends up on top
+          if (floor < H + 40 && f.y + f.h > floor && f.y + f.h < floor + 60) { f.landed = f.t; f.y = floor - f.h; f.a0 = f.a; f.el.firstChild.pauseAnimations(); /* stops fluttering once it's down */ f.lie = -(66 + Math.random() * 18); }   // tips over pole-first, so the cloth ends up on top
         } else {
           const u = Math.min(1, (f.t - f.landed) / .35);
           f.a = f.a0 + (f.lie - f.a0) * (1 - Math.pow(1 - u, 3));   // tips over onto the panel
           f.el.style.opacity = Math.max(0, 1 - Math.max(0, f.t - f.landed - 1.4) / .6);
         }
         f.el.style.transform = `translate(${f.x}px, ${f.y}px) rotate(${f.a}deg)`;
-        f.el.style.visibility = 'visible';
+        if (!f.shown) { f.el.style.visibility = 'visible'; f.shown = true; }
         if (f.y > H + 60 || (f.landed && f.t - f.landed > 2)) { f.el.remove(); live.splice(i, 1); }
       }
       raf = live.length ? requestAnimationFrame(tick) : 0;
@@ -392,7 +392,7 @@
       if (live.length > 220) return;
       const w = 26 + Math.random() * 22, h = w * 2 / 3, el = document.createElement('div');
       el.style.visibility = 'hidden'; el.style.transformOrigin = '2px 100%';
-      el.innerHTML = `<svg width="${w}" height="${h + 14}" viewBox="0 -2 30 34" style="display:block;overflow:visible;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))">
+      el.innerHTML = `<svg width="${w}" height="${h + 14}" viewBox="0 -2 30 34" style="display:block;overflow:visible">
         <path d="M1 -2 V32" stroke="#6b5a3a" stroke-width="1.6" stroke-linecap="round"/>
         <g><rect x="1.5" y="0" width="28" height="5" fill="#AA151B"/><rect x="1.5" y="5" width="28" height="10" fill="#F1BF00"/><rect x="1.5" y="15" width="28" height="5" fill="#AA151B"/>
         <animateTransform attributeName="transform" type="skewY" values="0;-6;0;5;0" dur="${(.8 + Math.random() * .6).toFixed(2)}s" repeatCount="indefinite"/></g></svg>`;
