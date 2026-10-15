@@ -113,8 +113,8 @@
           <g><animateTransform attributeName="transform" type="rotate" values="0;540;0" keyTimes="0;.5;1" ${loop(3.4)}/>
             <circle class="k" r="14"/><path class="k" style="stroke-width:2" d="M-9 -10 Q-3 0 -9 10 M9 -10 Q3 0 9 10"/></g>
         </g>`;
-      // phones only have room under the photo for one of these, so the moving rally gets it and the still court sits out
-      return `<g data-phone="drop">${court}</g><g data-at="380,790" data-half="340"><g data-box="1">${net}${rally.replace('<g opacity="0">', '</g><g opacity="0">')}</g>`;
+      // phones only have room under the photo for the rally, so the court moves up beside the button
+      return `<g data-phone="beside-cta">${court}</g><g data-at="380,790" data-half="340"><g data-box="1">${net}${rally.replace('<g opacity="0">', '</g><g opacity="0">')}</g>`;
     },
 
     // bunting draws across the top and its flags drop in; handwritten Spanish words keep writing themselves
@@ -273,6 +273,16 @@
     for (const p of pins) {
       p.w.style.display = '';
       if (solid.length && p.el.dataset.phone === 'drop') { p.w.style.display = 'none'; continue; }
+      if (solid.length && p.el.dataset.phone === 'beside-cta') {   // shrink it into the space right of the button, above the photo
+        const cta = document.querySelector('.world-copy .cta'), ph = document.querySelector('.world-photo img'), sr = svg.getBoundingClientRect();
+        if (!cta || !ph) { p.w.style.display = 'none'; continue; }
+        const a = cta.getBoundingClientRect(), b = ph.getBoundingClientRect(), L = a.right + 18, R = innerWidth - 16, T = a.top - 6, B = b.top - 10;
+        const bb = p.el.getBBox(), k = Math.min((R - L) / (bb.width * s), (B - T) / (bb.height * s));
+        if (k < .2) { p.w.style.display = 'none'; continue; }
+        const px = L + ((R - L) - bb.width * s * k) / 2, py = T + ((B - T) - bb.height * s * k) / 2;
+        p.w.setAttribute('transform', `translate(${(x0 + (px - sr.left) / s).toFixed(1)} ${(y0 + (py - sr.top) / s).toFixed(1)}) scale(${k.toFixed(3)}) translate(${-bb.x} ${-bb.y})`);
+        continue;
+      }
       if (solid.length && p.el.dataset.word) continue;   // placed below
       if (!solid.length || p.fit || p.full) continue;
       const r = (p.el.querySelector(':scope > [data-box]') || p.w).getBoundingClientRect(), hit = solid.filter(o => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top);
