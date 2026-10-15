@@ -1,5 +1,25 @@
 /* Japanese and Spanish text for lang.js, keyed by the English HTML of each block. */
 window.TMS_T = {
+ "More": ["その他", "Más"],
+ "About us": ["私たちについて", "Sobre nosotros"],
+ "Why Carlos founded TMS: so Tokyo’s kids can grow up the way he did, always on the move.": ["カルロスがTMSを立ち上げた理由。東京の子どもたちにも、彼のようにいつも体を動かして育ってほしいから。", "Por qué Carlos fundó TMS: para que los niños de Tokio crezcan como él, siempre en movimiento."],
+ "Our story · Tokyo since 2021": ["私たちのストーリー・2021年から東京で", "Nuestra historia · Tokio desde 2021"],
+ "Carlos’s <em>story.</em>": ["カルロスの<em>ストーリー。</em>", "La historia <em>de Carlos.</em>"],
+ "Carlos grew up in Spain always on the move. Football with friends, swimming in the summer, any sport he could find, and board games around the table when the day was done. If there was something new to try, he wanted to try it.": ["カルロスはスペインで、いつも体を動かしながら育ちました。友達とのサッカー、夏の水泳、見つけられるあらゆるスポーツ、そして一日の終わりにはテーブルを囲んでボードゲーム。新しいことがあれば、何でもやってみたい子どもでした。", "Carlos creció en España siempre en movimiento. Fútbol con los amigos, natación en verano, cualquier deporte que encontrara y juegos de mesa alrededor de la mesa al terminar el día. Si había algo nuevo que probar, quería probarlo."],
+ "Along the way he noticed something. Staying active didn’t just keep him fit. It kept his mind clear and his mood bright, and it gave him a new challenge every single day.": ["そのなかで、彼はあることに気づきました。体を動かすことは、体力をつけるだけではない。頭をすっきりさせ、気持ちを明るくし、毎日新しい挑戦をくれるのだと。", "Por el camino se dio cuenta de algo. Mantenerse activo no solo lo mantenía en forma. Le despejaba la mente, le alegraba el ánimo y le daba un nuevo reto cada día."],
+ "As he grew up, through his studies in sports science and years of coaching, he became a champion for children doing the same: playing, moving and trying new things, for the joy of it.": ["スポーツ科学を学び、長年コーチを続けるなかで、彼は子どもたちにも同じことを勧めるようになりました。遊び、体を動かし、新しいことに挑戦する。ただ楽しいから。", "Con los años, entre sus estudios de ciencias del deporte y su trabajo como entrenador, se convirtió en un defensor de que los niños hicieran lo mismo: jugar, moverse y probar cosas nuevas, por el puro placer de hacerlo."],
+ "When he started TMS in Tokyo in 2021, he wanted the children of the city to have that too. A place to enjoy sport, to move and to play together. Being healthy and happy isn’t the goal we chase. It’s what happens when kids love being active.": ["2021年に東京でTMSを始めたとき、彼はこの街の子どもたちにも同じ経験をしてほしいと願いました。スポーツを楽しみ、体を動かし、一緒に遊べる場所を。健康で幸せであることは、私たちが追いかける目標ではありません。子どもたちが体を動かすことを好きになったとき、自然とついてくるものです。", "Cuando fundó TMS en Tokio en 2021, quiso que los niños de la ciudad también lo tuvieran. Un lugar para disfrutar del deporte, moverse y jugar juntos. Estar sanos y felices no es la meta que perseguimos. Es lo que ocurre cuando a los niños les encanta estar activos."],
+ "What we <em>believe.</em>": ["私たちが<em>大切にしていること。</em>", "Lo que <em>creemos.</em>"],
+ "Move every day": ["毎日体を動かそう", "Moverse cada día"],
+ "Play first": ["遊びが一番", "Primero, jugar"],
+ "Sport, games and play, as many kinds as we can fit in, so every child finds something they love.": ["スポーツ、ゲーム、遊び。できるだけたくさんの種類を用意して、どの子も夢中になれるものを見つけられるように。", "Deporte, juegos y juego libre, todos los que podamos, para que cada niño encuentre algo que le encante."],
+ "Healthy body, healthy mind": ["健やかな体、健やかな心", "Cuerpo sano, mente sana"],
+ "Feel good": ["気持ちよく", "Sentirse bien"],
+ "Being active builds strength and stamina, and with them focus, confidence and calm.": ["体を動かすことで力と体力がつき、それとともに集中力、自信、落ち着きも育ちます。", "Estar activo desarrolla fuerza y resistencia, y con ellas concentración, confianza y calma."],
+ "A new challenge": ["新しい挑戦", "Un nuevo reto"],
+ "Keep growing": ["成長し続ける", "Seguir creciendo"],
+ "Every session asks a little more. Kids learn to try, to miss, and to try again.": ["毎回のセッションで、少しずつ上を目指します。挑戦して、失敗して、またやってみる。それを子どもたちは学びます。", "Cada sesión pide un poco más. Los niños aprenden a intentarlo, a fallar y a volver a intentarlo."],
+ "Carlos Moreno, founder and head coach": ["創設者・ヘッドコーチ、カルロス・モレノ", "Carlos Moreno, fundador y entrenador principal"],
  "<span class=\"egg-word\">Birthday</span> parties": [
   "<span class=\"egg-word\">誕生日</span>パーティー",
   "Fiestas de <span class=\"egg-word\">cumpleaños</span>"

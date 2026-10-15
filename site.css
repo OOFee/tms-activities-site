@@ -13,6 +13,7 @@
   --world-night: #152019;
   --world-support: #233A63;
   --world-faq: #3A4250;
+  --world-about: #1F4E4A;
 }
 * { box-sizing: border-box; margin: 0; }
 html { scroll-behavior: smooth; }
@@ -332,5 +333,15 @@ html[lang="ja"] body { font-family: "Figtree", "Hiragino Sans", "Hiragino Kaku G
 
 /* a visitor reading in Japanese/Spanish doesn't see the English flash before lang.js swaps the text */
 html.lang-wait body { visibility: hidden; }
+
+/* about: Carlos's story */
+.storyrow { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+.storyphoto img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; transform: rotate(1.5deg); box-shadow: 0 18px 40px rgba(20,30,24,.18); }
+@media (max-width: 860px) { .storyrow { grid-template-columns: 1fr; gap: 28px; } .storyphoto img { aspect-ratio: 4 / 3; } }
+.story { margin-top: 22px; max-width: 66ch; }
+.story p { font-size: 18px; line-height: 1.75; color: #36403a; text-wrap: pretty; }
+.story p + p { margin-top: 16px; }
+.story p:first-child { font-family: "Fraunces", serif; font-size: clamp(21px, 2vw, 25px); line-height: 1.55; color: #1C2420; }
+@media (max-width: 700px) { .story p { font-size: 16.5px; } }
 
 @view-transition { navigation: auto; }

@@ -186,6 +186,26 @@
       return s;
     },
 
+    // about: a life of trying everything. A die tumbles, a chess pawn, a ball bouncing along, a heart that beats
+    about() {
+      t = .3;
+      const die = `<g data-at="690,150"><g transform="translate(690 150)"><g>
+          <animateTransform attributeName="transform" type="rotate" values="0;8;-6;0;0" keyTimes="0;.1;.2;.3;1" dur="5s" begin="2s" repeatCount="indefinite"/>
+          ${draw('M-34 -24 q0 -10 10 -10 h48 q10 0 10 10 v48 q0 10 -10 10 h-48 q-10 0 -10 -10 Z', .8)}
+          <g class="fade" style="--del:${t.toFixed(2)}s"><circle class="kf" r="5" cx="-14" cy="-14"/><circle class="kf" r="5"/><circle class="kf" r="5" cx="14" cy="14"/></g></g></g></g>`;
+      const pawn = `<g data-at="520,250"><g transform="translate(520 250)">${draw('M-26 40 h52 M-18 40 q2 -22 10 -34 h16 q8 12 10 34 M-14 6 h28 M0 -6 m-13 0 a13 13 0 1 0 26 0 a13 13 0 1 0 -26 0', 1)}</g></g>`;
+      const run = draw('M80 860 l60 -40 l40 30 l60 -50 l40 30 l60 -46', 1.1, 'style="stroke-width:2.4;stroke-dasharray:.02 .025"');
+      const hop = 'M 700 850 Q 760 740 820 850 Q 870 770 920 850 Q 960 800 1000 850';
+      const ballGo = `<path id="kHop" d="${hop}" fill="none"/><path class="k" pathLength="1" style="stroke-width:1.6;stroke-dasharray:.012 .03;opacity:.5" d="${hop}"/>
+        <g opacity="0"><set attributeName="opacity" to="1" begin="${t.toFixed(2)}s" fill="freeze"/>
+          <animateMotion keyPoints="0;1;1" keyTimes="0;.7;1" calcMode="linear" ${loop(4.2)}><mpath href="#kHop"/></animateMotion>
+          <g><animateTransform attributeName="transform" type="rotate" values="0;540;540" keyTimes="0;.7;1" ${loop(4.2)}/>${ball(16)}</g></g>`;
+      const heart = `<g data-at="1390,800"><g transform="translate(1390 800) scale(1.1)"><g>
+          <animateTransform attributeName="transform" type="scale" values="1;1.12;1;1.08;1" keyTimes="0;.1;.2;.3;1" dur="2.4s" begin="2.4s" repeatCount="indefinite"/>
+          ${draw('M0 14 C-34 -10 -22 -38 0 -22 C22 -38 34 -10 0 14 Z', .6)}</g></g></g>`;
+      return die + pawn + `<g>${run}</g>` + `<g data-at="850,820">${ballGo}</g>` + heart;
+    },
+
     // a chalk thank-you: big handwritten "thank you" under the copy, "¡gracias!" up top, hearts that draw in and beat
     supporters() {
       const heart = (x, y, sc, beg) => `<g transform="translate(${x} ${y}) scale(${sc})"><g>

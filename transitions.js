@@ -16,7 +16,7 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
   };
   // pages the nav pill can fade to (activity worlds plus the dark pages)
   const NAV_COLORS = Object.assign({}, COLORS, {
-    '/coaches.html': '#152019', '/supporters.html': '#233A63', '/faq.html': '#3A4250',
+    '/coaches.html': '#152019', '/supporters.html': '#233A63', '/faq.html': '#3A4250', '/about.html': '#1F4E4A',
     '/join.html': '#152019', '/c.html': '#152019', '/': '#152019',
   });
 
