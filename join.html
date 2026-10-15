@@ -6,7 +6,7 @@
 <title>Join us · TMS Activities</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Figtree:wght@400;500;600;700&display=block" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=91f30441">
+<link rel="stylesheet" href="site.css?v=fa0b2374">
 <script src="lite.js?v=ae5314a7"></script>
 <script>try{if((localStorage.getItem("lang")||"en")!=="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},2000)}}catch(e){}</script>
 <script>
@@ -69,7 +69,6 @@
     <h1>Join us.</h1>
     <p class="lede">All ages, all levels. Tell us who's playing and we'll take it from there.</p>
     <p class="meta">Free trial for every programme</p>
-    <a class="cta" href="join.html">See the programmes</a>
   </div>
   <div class="world-photo"><img src="https://tmsactivities.jp/wp-content/uploads/2025/03/9ac7fab6-baee-4829-b635-ca47b944e852.jpg" alt=""></div>
 </section>
@@ -77,43 +76,86 @@
 
 <div class="wrap">
   <h2 class="sec">Join <em>the club.</em></h2>
-  <p class="sec-lede">Fill this in and we'll get back to you with trial dates. (Demo form. Not wired up yet.)</p>
-  <form class="joinform" onsubmit="return false">
-    <style>
-      .joinform { margin-top:36px; display:grid; grid-template-columns:1fr 1fr; gap:18px; max-width:840px; }
-      .joinform label { display:flex; flex-direction:column; gap:6px; font-weight:700; font-size:14px; }
-      .joinform input, .joinform select, .joinform textarea {
-        font: 15.5px "Figtree", sans-serif; padding: 12px 14px; border: 1.5px solid #d6d6cf; border-radius: 10px; background:#fff;
-      }
-      .joinform input:focus, .joinform select:focus, .joinform textarea:focus { outline: 2px solid var(--grass); border-color: transparent; }
-      .joinform .full { grid-column: 1 / -1; }
-      .joinform button { grid-column: 1 / -1; justify-self: start; font: 700 16px "Figtree", sans-serif; background: var(--night); color: var(--chalk); border: 0; border-radius: 999px; padding: 14px 32px; cursor: pointer; }
-      .joinform button:hover { background: var(--grass); }
-      @media (max-width:640px){ .joinform { grid-template-columns: 1fr; } }
-    </style>
-    <label>Child's name <input placeholder="Name"></label>
-    <label>Surname <input placeholder="Surname"></label>
-    <label>Date of birth <input type="date"></label>
-    <label>Age <input type="number" min="1" max="100"></label>
-    <label>Guardian name <input></label>
-    <label>Guardian surname <input></label>
-    <label>Phone <input type="tel"></label>
-    <label>Email <input type="email"></label>
-    <label class="full">Address <input></label>
-    <label>Sport
-      <select><option>Football</option><option>Swimming</option><option>Tennis</option><option>Spanish</option><option>Other</option></select>
-    </label>
-    <label>Class
-      <select><option>Monthly fee · once a week</option><option>Monthly fee · twice a week</option><option>Competition team: U8, U10, U12</option><option>Sunday matches (twice a month)</option></select>
-    </label>
-    <label>T-shirt size
-      <select><option>130</option><option>140</option><option>150</option><option>160</option><option>S</option><option>M</option><option>L</option></select>
-    </label>
-    <label>Preferred day <input placeholder="e.g. Tuesdays"></label>
-    <label class="full">Notes <textarea rows="3" placeholder="Anything we should know"></textarea></label>
-    <label class="full" style="flex-direction:row; align-items:flex-start; gap:10px; font-weight:500;"><input type="checkbox" style="margin-top:3px"> I agree to the club's rules, terms and photo policy, and to accompany my child during practice.</label>
-    <button>Send application</button>
+  <p class="sec-lede">Four quick steps and we’ll get back to you with trial dates.</p>
+  <form class="joinform" novalidate>
+    <fieldset>
+      <legend><span class="n">1</span> Who’s playing?</legend>
+      <div class="grid">
+        <label class="field"><span>First name</span><input name="child" autocomplete="off" required></label>
+        <label class="field"><span>Surname</span><input name="childSurname" autocomplete="off"></label>
+        <label class="field"><span>Date of birth</span><input type="date" name="dob" required></label>
+        <p class="agebox" aria-live="polite" hidden></p>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend><span class="n">2</span> What would they like to try?</legend>
+      <p class="hint">Pick as many as you like. Classes that suit their age are marked.</p>
+      <div class="chips big" role="group"><label class="chip"><input type="checkbox" name="sport" value="football"><span>Football</span></label><label class="chip"><input type="checkbox" name="sport" value="swimming"><span>Swimming</span></label><label class="chip"><input type="checkbox" name="sport" value="tennis"><span>Tennis</span></label><label class="chip"><input type="checkbox" name="sport" value="spanish"><span>Spanish</span></label></div>
+      <div class="classes" data-sport="football" hidden>
+        <h4>Football classes</h4>
+        <div class="chips"><label class="chip" data-min="2" data-max="3"><input type="checkbox" name="class-football" value="baby"><span>Baby School <small>2–3 yrs</small></span></label><label class="chip" data-min="4" data-max="5"><input type="checkbox" name="class-football" value="pups"><span>Pups <small>4–5 yrs</small></span></label><label class="chip" data-min="6" data-max="9"><input type="checkbox" name="class-football" value="pumas"><span>Pumas <small>6–9 yrs</small></span></label><label class="chip" data-min="5" data-max="16"><input type="checkbox" name="class-football" value="girls"><span>Girls Team <small>5–16 yrs</small></span></label><label class="chip" data-min="7" data-max="12"><input type="checkbox" name="class-football" value="comp"><span>Competition Teams <small>U8 · U10 · U12</small></span></label><label class="chip" data-min="13" data-max="18"><input type="checkbox" name="class-football" value="u18"><span>U18 Team <small>13–18 yrs</small></span></label><label class="chip"><input type="checkbox" name="class-football" value="private"><span>Private Lesson <small>1-on-1</small></span></label><label class="chip" data-min="6" data-max="18"><input type="checkbox" name="class-football" value="stars"><span>Future Stars <small>max 4 players</small></span></label><label class="chip" data-min="4" data-max="12"><input type="checkbox" name="class-football" value="spsoc"><span>Spanish &amp; Soccer <small>kids</small></span></label><label class="chip"><input type="checkbox" name="class-football" value="family"><span>Parents &amp; Children <small>families</small></span></label></div>
+        <div class="sub2"><span class="lab">How often?</span><div class="chips"><label class="chip"><input type="radio" name="freq" value="1"><span>Once a week</span></label><label class="chip"><input type="radio" name="freq" value="2"><span>Twice a week</span></label></div></div>
+        <label class="field small"><span>Kit size</span><select name="kit"><option value="">Choose a size</option><option>130</option><option>140</option><option>150</option><option>160</option><option>S</option><option>M</option><option>L</option></select></label>
+      </div>
+      <div class="classes" data-sport="swimming" hidden>
+        <h4>Swimming lessons</h4>
+        <div class="chips"><label class="chip" data-min="6" data-max="15"><input type="checkbox" name="class-swimming" value="group"><span>Group class <small>45–55 min</small></span></label><label class="chip" data-min="3" data-max="15"><input type="checkbox" name="class-swimming" value="p1"><span>Private · 1 kid <small>45 min</small></span></label><label class="chip" data-min="3" data-max="15"><input type="checkbox" name="class-swimming" value="p2"><span>Private · 2 kids <small>45 min</small></span></label><label class="chip" data-min="18" data-max="99"><input type="checkbox" name="class-swimming" value="padult"><span>Private · adults <small>1 hour</small></span></label></div>
+      </div>
+      <div class="classes" data-sport="tennis" hidden>
+        <h4>Tennis classes</h4>
+        <div class="chips"><label class="chip" data-min="6" data-max="9"><input type="checkbox" name="class-tennis" value="k69"><span>Kids 6–9 <small>60 min</small></span></label><label class="chip" data-min="9" data-max="12"><input type="checkbox" name="class-tennis" value="k912"><span>Kids 9–12 <small>60 min</small></span></label><label class="chip" data-min="13" data-max="16"><input type="checkbox" name="class-tennis" value="t1316"><span>Teens 13–16 <small>60 min</small></span></label><label class="chip" data-min="17" data-max="99"><input type="checkbox" name="class-tennis" value="adult"><span>Adults class <small>90 min</small></span></label><label class="chip" data-min="17" data-max="99"><input type="checkbox" name="class-tennis" value="cardio"><span>Women cardio tennis <small>90 min</small></span></label><label class="chip"><input type="checkbox" name="class-tennis" value="private"><span>Private classes <small>1–3 people</small></span></label></div>
+      </div>
+      <div class="classes" data-sport="spanish" hidden>
+        <h4>Spanish lessons</h4>
+        <div class="chips"><label class="chip" data-min="3" data-max="16"><input type="checkbox" name="class-spanish" value="kids"><span>Kids private lessons <small>All levels</small></span></label><label class="chip" data-min="17" data-max="99"><input type="checkbox" name="class-spanish" value="adults"><span>Adults private lessons <small>Beginner to advanced</small></span></label><label class="chip" data-min="4" data-max="16"><input type="checkbox" name="class-spanish" value="native"><span>Native group lessons <small>Twice a month</small></span></label></div>
+      </div>
+      <p class="err" data-for="sport" hidden>Pick at least one sport.</p>
+    </fieldset>
+    <fieldset>
+      <legend><span class="n">3</span> Your details</legend>
+      <div class="grid">
+        <label class="field"><span>Your first name</span><input name="guardian" autocomplete="given-name" required></label>
+        <label class="field"><span>Your surname</span><input name="guardianSurname" autocomplete="family-name"></label>
+        <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel"></label>
+        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" required></label>
+        <label class="field full"><span>Address (optional)</span><input name="address" autocomplete="street-address"></label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend><span class="n">4</span> When suits you?</legend>
+      <div class="chips"><label class="chip"><input type="checkbox" name="day" value="Mon"><span>Mon</span></label><label class="chip"><input type="checkbox" name="day" value="Tue"><span>Tue</span></label><label class="chip"><input type="checkbox" name="day" value="Wed"><span>Wed</span></label><label class="chip"><input type="checkbox" name="day" value="Thu"><span>Thu</span></label><label class="chip"><input type="checkbox" name="day" value="Fri"><span>Fri</span></label><label class="chip"><input type="checkbox" name="day" value="Sat"><span>Sat</span></label><label class="chip"><input type="checkbox" name="day" value="Sun"><span>Sun</span></label></div>
+      <label class="field full"><span>Anything we should know?</span><textarea name="notes" rows="3"></textarea></label>
+    </fieldset>
+    <label class="agree"><input type="checkbox" name="agree" required><span>I agree to the club’s rules, terms and photo policy, and to accompany my child during practice.</span></label>
+    <p class="err" data-for="form" hidden>A few things are missing. They’re marked above.</p>
+    <button type="submit">Send application</button>
+    <div class="thanks" hidden><h3>Thank you!</h3><p>We’ll be in touch with trial dates soon. (This is a demo form, so nothing was sent yet.)</p></div>
   </form>
+  <script>
+  (() => {
+    const f = document.querySelector('.joinform'), q = (s) => f.querySelector(s), all = (s) => [...f.querySelectorAll(s)];
+    // a sport's classes open when it's picked
+    const sync = () => all('input[name=sport]').forEach(i => { q(`.classes[data-sport="${i.value}"]`).hidden = !i.checked; });
+    // age from date of birth; classes that suit it get a "Good fit" mark
+    const age = () => { const v = q('input[name=dob]').value; if (!v) return null; const d = new Date(v), n = new Date();
+      let a = n.getFullYear() - d.getFullYear(); if (n < new Date(n.getFullYear(), d.getMonth(), d.getDate())) a--; return a >= 0 && a < 100 ? a : null; };
+    const fit = () => { const a = age(), box = q('.agebox');
+      box.hidden = a === null; if (a !== null) box.innerHTML = `<b>${a}</b> <span>${{ ja: '歳', es: 'años' }[document.documentElement.lang] || 'years old'}</span>`;
+      all('.chip[data-min]').forEach(c => c.classList.toggle('fit', a !== null && a >= +c.dataset.min && a <= +c.dataset.max)); };
+    f.addEventListener('change', (e) => { if (e.target.name === 'sport') sync(); if (e.target.name === 'dob') fit();
+      e.target.closest('.field, .agree, fieldset')?.classList.remove('bad'); });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      all('.bad').forEach(x => x.classList.remove('bad')); all('.err').forEach(x => x.hidden = true);
+      let ok = true;
+      all('[required]').forEach(i => { const bad = i.type === 'checkbox' ? !i.checked : !i.value.trim(); if (bad) { ok = false; i.closest('.field, .agree').classList.add('bad'); } });
+      if (!all('input[name=sport]:checked').length) { ok = false; q('.err[data-for=sport]').hidden = false; }
+      if (!ok) { q('.err[data-for=form]').hidden = false; f.querySelector('.bad, .err:not([hidden])').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      all('fieldset, .agree, button[type=submit]').forEach(x => x.hidden = true); q('.thanks').hidden = false; q('.thanks').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    sync(); fit();
+  })();
+  </script>
 </div>
 
 </div>
@@ -166,7 +208,7 @@
   </div>
 </footer>
 <div class="socialpin"><a class="wa" href="https://wa.me/818089162274" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9.2 7.6c.3-.1.6 0 .7.3l.7 1.6c.1.3 0 .5-.2.7l-.5.6c.6 1.2 1.6 2.2 2.9 2.9l.6-.5c.2-.2.5-.2.7-.1l1.6.7c.3.1.4.4.3.7-.3 1-1.2 1.6-2.2 1.4-2.6-.5-4.7-2.6-5.3-5.2-.2-1 .4-1.9 1.4-2.2z" fill="currentColor"/></svg></a><a class="ig" href="https://www.instagram.com/spainup.soccer.academy/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a></div>
-<script src="lang-text.js?v=849f8099"></script>
+<script src="lang-text.js?v=993c5a73"></script>
 <script src="lang.js?v=e1dfec5e"></script>
 <script src="transitions.js?v=78422ccd" defer></script>
 <script src="eggs.js?v=8b5c6eaf" defer></script>

@@ -344,4 +344,56 @@ html.lang-wait body { visibility: hidden; }
 .story p:first-child { font-family: "Fraunces", serif; font-size: clamp(21px, 2vw, 25px); line-height: 1.55; color: #1C2420; }
 @media (max-width: 700px) { .story p { font-size: 16.5px; } }
 
+/* join form: four short steps, tap-to-pick chips */
+.joinform { margin-top: 32px; max-width: 860px; display: flex; flex-direction: column; gap: 22px; }
+.joinform fieldset { border: 0; margin: 0; background: #fff; border-radius: 16px; padding: 26px 28px 28px; box-shadow: 0 2px 6px rgba(20,30,24,.05), 0 12px 28px rgba(20,30,24,.06); }
+.joinform legend { float: left; width: 100%; display: flex; align-items: center; gap: 12px; font: 400 24px/1.2 "Fraunces", serif; letter-spacing: -.01em; color: #1C2420; margin-bottom: 18px; }
+.joinform legend .n { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--grass); color: #fff; font: 700 15px "Figtree", sans-serif; flex: none; }
+.joinform legend + * { clear: both; }
+.joinform .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end; }
+.joinform .field { display: flex; flex-direction: column; gap: 6px; }
+.joinform .field.full { grid-column: 1 / -1; margin-top: 16px; }
+.joinform .grid .field.full { margin-top: 0; }
+.joinform .field > span, .joinform .lab { font-weight: 700; font-size: 14px; color: #2b332e; }
+.joinform input:not([type=checkbox]):not([type=radio]), .joinform select, .joinform textarea {
+  font: 16px "Figtree", sans-serif; padding: 12px 14px; border: 1.5px solid #d9d8d0; border-radius: 10px; background: #fbfbf8; color: #1C2420; width: 100%; }
+.joinform input:focus, .joinform select:focus, .joinform textarea:focus { outline: 2px solid var(--grass); outline-offset: 1px; border-color: transparent; background: #fff; }
+.joinform .field.small { max-width: 220px; margin-top: 14px; }
+.joinform .bad input, .joinform .bad select { border-color: #c4473a; background: #fff6f4; }
+.joinform .agebox { margin: 0 0 4px; padding: 11px 16px; border-radius: 10px; background: #eef4ee; color: #2b332e; font-size: 15px; align-self: end; }
+.joinform .agebox b { font: 600 22px "Fraunces", serif; color: var(--grass); margin-right: 4px; }
+.joinform .hint { color: #66706a; font-size: 14.5px; margin: -8px 0 14px; }
+.joinform h4 { font-size: 14px; font-weight: 700; color: #2b332e; margin: 20px 0 10px; }
+.joinform .classes { border-top: 1px dashed #dddcd3; margin-top: 18px; }
+.joinform .sub2 { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+/* chips: real checkboxes underneath, so keyboards and screen readers work as normal */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; cursor: pointer; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span { display: inline-flex; align-items: baseline; gap: 6px; padding: 9px 15px; border-radius: 999px; border: 1.5px solid #d9d8d0; background: #fbfbf8; font-size: 15px; font-weight: 600; color: #2b332e; transition: background .15s, border-color .15s, color .15s; }
+.chip span small { font-weight: 500; font-size: 12.5px; color: #7a837d; }
+.chip:hover span { border-color: var(--grass); }
+.chip input:focus-visible + span { outline: 2px solid var(--grass); outline-offset: 2px; }
+.chip input:checked + span { background: var(--grass); border-color: var(--grass); color: #fff; }
+.chip input:checked + span small { color: #e3efe5; }
+.chips.big .chip span { padding: 12px 22px; font-size: 16.5px; }
+.chip.fit span::after { content: "Good fit"; font-size: 11px; font-weight: 700; color: var(--grass); background: #e3efe5; border-radius: 999px; padding: 2px 7px; margin-left: 2px; }
+html[lang="ja"] .chip.fit span::after { content: "おすすめ"; }
+html[lang="es"] .chip.fit span::after { content: "Ideal"; }
+.chip.fit input:checked + span::after { color: var(--grass); background: #fff; }
+.joinform .agree { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; color: #36403a; cursor: pointer; }
+.joinform .agree input { width: 20px; height: 20px; margin-top: 1px; accent-color: var(--grass); flex: none; }
+.joinform .agree.bad span { color: #c4473a; }
+.joinform .err { color: #c4473a; font-weight: 600; font-size: 14.5px; margin: 10px 0 0; }
+.joinform button[type=submit] { align-self: flex-start; font: 700 16.5px "Figtree", sans-serif; background: var(--night); color: var(--chalk); border: 0; border-radius: 999px; padding: 15px 34px; cursor: pointer; }
+.joinform button[type=submit]:hover { background: var(--grass); }
+.joinform .thanks { background: #eef4ee; border-radius: 16px; padding: 28px; }
+.joinform .thanks h3 { font: 400 28px "Fraunces", serif; color: var(--grass); }
+.joinform .thanks p { margin-top: 8px; color: #36403a; }
+@media (max-width: 640px) {
+  .joinform fieldset { padding: 22px 18px 22px; }
+  .joinform .grid { grid-template-columns: 1fr; }
+  .joinform legend { font-size: 21px; }
+}
+
 @view-transition { navigation: auto; }
