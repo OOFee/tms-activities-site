@@ -445,5 +445,6 @@ header nav .m-only { display: none; }
 .quickask:hover { border-color: var(--grass); transform: translateY(-1px); }
 .quickask .qi { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--flood); font: 700 15px "Figtree", sans-serif; }
 .quickask span:last-child::after { content: " →"; color: var(--grass); }
+.flogos img[src*="mst-logo"] { height: 48px; margin: -5px 0; }   /* thin round logo: let it fill the chip */
 
 @view-transition { navigation: auto; }
