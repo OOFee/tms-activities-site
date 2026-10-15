@@ -56,11 +56,14 @@
   function picker() {
     var header = document.querySelector('body > header');
     if (!header) return;
-    var box = document.createElement('div');
-    box.className = 'langpick';
-    box.innerHTML = '<button type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language"></button><ul>' +
-      LANGS.map(function (l) { return '<li><button type="button" data-lang="' + l.id + '"><span class="flag">' + l.flag + '</span>' + l.name + '</button></li>'; }).join('') + '</ul>';
-    header.insertBefore(box, header.querySelector('.navtoggle'));
+    var box = header.querySelector('.langpick');   // written into each page's header so it's there from the first frame
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'langpick';
+      box.innerHTML = '<button type="button" aria-haspopup="true" aria-expanded="false" aria-label="Language"></button><ul>' +
+        LANGS.map(function (l) { return '<li><button type="button" data-lang="' + l.id + '"><span class="flag">' + l.flag + '</span>' + l.name + '</button></li>'; }).join('') + '</ul>';
+      header.insertBefore(box, header.querySelector('.navtoggle'));
+    }
     var top = box.firstChild;
     var close = function () { box.classList.remove('open'); top.setAttribute('aria-expanded', 'false'); };
     top.addEventListener('click', function (e) { e.stopPropagation(); var o = box.classList.toggle('open'); top.setAttribute('aria-expanded', o ? 'true' : 'false'); });
@@ -76,6 +79,7 @@
   collect();
   picker();
   apply(lang);
+  document.documentElement.classList.remove('lang-wait');
 
   // the mobile menu button flips between Menu / Close in transitions.js
   var toggle = document.querySelector('.navtoggle');

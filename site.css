@@ -330,4 +330,7 @@ html[lang="ja"] body { font-family: "Figtree", "Hiragino Sans", "Hiragino Kaku G
 /* coach photos across the top of each coach card */
 .ccard .cphoto { width: calc(100% + 56px); max-width: none; margin: -26px -28px 8px; aspect-ratio: 5 / 4; object-fit: cover; object-position: 50% 22%; border-radius: 12px 12px 0 0; background: #e8e5dc; }
 
+/* a visitor reading in Japanese/Spanish doesn't see the English flash before lang.js swaps the text */
+html.lang-wait body { visibility: hidden; }
+
 @view-transition { navigation: auto; }
