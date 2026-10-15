@@ -8,6 +8,7 @@
 
   const css = `
     .world .scenery .poppable { pointer-events: all; cursor: pointer; }
+    .world .scenery .hit { fill: none; stroke: none; }
     .egg-word { display: inline-block; }
     .egg-title, .egg-word { cursor: pointer; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; text-decoration: underline wavy rgba(245,243,236,0); text-decoration-thickness: 2px; text-underline-offset: .12em; transition: text-decoration-color .25s; }
     .egg-title:hover, .egg-word:hover { text-decoration-color: rgba(245,243,236,.6); }
@@ -78,16 +79,20 @@
   }
 
   const scenery = document.querySelector('.world .scenery svg');
+  const hitR = (r) => Math.max(r * 2.2, r + 18);   // bubbles are small; give fingers and mice a generous target
 
   // swimming: pop the rising bubbles
   if (page === 'swimming' && scenery && !window.TMS_LITE) {
     scenery.querySelectorAll('circle').forEach(c => {
       if (!c.querySelector('animate[attributeName="cy"]')) return;
-      c.classList.add('poppable');
-      c.addEventListener('pointerdown', e => {
+      // an invisible, bigger copy rides along on the same animation and takes the clicks
+      const hit = c.cloneNode(true);
+      hit.setAttribute('class', 'hit poppable'); hit.removeAttribute('style'); hit.setAttribute('r', hitR(+c.getAttribute('r')).toFixed(1));
+      c.after(hit);
+      hit.addEventListener('pointerdown', e => {
         const r = c.getBoundingClientRect();
         pop('bubble'); burst(scenery, r.left + r.width / 2, r.top + r.height / 2, Math.max(10, r.width * .7));
-        hideUntilNextLoop(scenery, c, c.querySelector('animate'));
+        hideUntilNextLoop(scenery, c, c.querySelector('animate')); hideUntilNextLoop(scenery, hit, hit.querySelector('animate'));
         e.stopPropagation();
       });
     });
@@ -294,21 +299,23 @@
       const top = scenery.viewBox.baseVal.y - 30;
       for (let i = live.length - 1; i >= 0; i--) {
         const b = live[i]; b.t += dt; b.y -= b.v * dt;
-        b.el.setAttribute('cx', (b.x + Math.sin(b.t * b.f) * b.w).toFixed(1)); b.el.setAttribute('cy', b.y.toFixed(1));
-        if (b.y < top || !b.el.isConnected) { b.el.remove(); live.splice(i, 1); }
+        const x = (b.x + Math.sin(b.t * b.f) * b.w).toFixed(1), y = b.y.toFixed(1);
+        b.el.setAttribute('cx', x); b.el.setAttribute('cy', y); b.hit.setAttribute('cx', x); b.hit.setAttribute('cy', y);
+        if (b.y < top || !b.el.isConnected) { b.el.remove(); b.hit.remove(); live.splice(i, 1); }
       }
       raf = live.length ? requestAnimationFrame(tick) : 0;
     };
     const bubble = () => {
       if (live.length > 160) return;
       const vb = scenery.viewBox.baseVal, el = document.createElementNS(NS, 'circle'), r = 5 + Math.random() * 11;
-      el.setAttribute('class', 'k poppable'); el.style.strokeWidth = 2; el.setAttribute('r', r.toFixed(1));
-      const b = { el, x: vb.x + Math.random() * vb.width, y: vb.y + vb.height + 20, v: 110 + Math.random() * 140, t: Math.random() * 6, f: 2 + Math.random() * 2, w: 6 + Math.random() * 10 };
-      el.addEventListener('pointerdown', e => {
+      el.setAttribute('class', 'k'); el.style.strokeWidth = 2; el.setAttribute('r', r.toFixed(1));
+      const hit = document.createElementNS(NS, 'circle'); hit.setAttribute('class', 'hit poppable'); hit.setAttribute('r', hitR(r).toFixed(1));
+      const b = { el, hit, x: vb.x + Math.random() * vb.width, y: vb.y + vb.height + 20, v: 110 + Math.random() * 140, t: Math.random() * 6, f: 2 + Math.random() * 2, w: 6 + Math.random() * 10 };
+      hit.addEventListener('pointerdown', e => {
         const rc = el.getBoundingClientRect(); pop('bubble'); burst(scenery, rc.left + rc.width / 2, rc.top + rc.height / 2, Math.max(10, rc.width * .7));
-        el.remove(); e.stopPropagation();
+        el.remove(); hit.remove(); e.stopPropagation();
       });
-      root.append(el); live.push(b);
+      root.append(el, hit); live.push(b);
       if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
     };
     title.addEventListener('click', () => { for (let i = 0; i < 16; i++) setTimeout(bubble, i * 70 + Math.random() * 500); });
