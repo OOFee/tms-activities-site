@@ -416,33 +416,15 @@ html[lang="es"] .chip.fit span::after { content: "Ideal"; }
 }
 @media print { .askbox { display: none; } }
 
-/* mobile menu extras: past clubs, divider after the activities, sign-up button */
+/* mobile menu extras: divider after the activities, sign-up button */
 header nav .m-only { display: none; }
 @media (max-width: 980px) {
   header.open nav .m-only { display: block; }
   header.open nav hr { height: 1px; border: 0; background: rgba(20,25,22,.14); margin: 6px 12px; }
-  .pastclubs summary { list-style: none; padding: 12px 16px; font: 400 16px "Figtree", sans-serif; color: #1C2420; opacity: .7; cursor: pointer; border-radius: 10px; }
-  .pastclubs summary::-webkit-details-marker { display: none; }
-  .pastclubs summary::after { content: "▾"; font-size: 11px; margin-left: 7px; display: inline-block; transition: transform .2s; }
-  .pastclubs[open] summary::after { transform: rotate(180deg); }
-  .pastclubs p { white-space: normal; margin: 0 16px 10px; font-size: 14px; line-height: 1.5; color: #1C2420; opacity: .78; }
-  .pastclubs .suggest { margin: 0 16px 10px; font: 600 13.5px "Figtree", sans-serif; color: #1C2420; background: rgba(20,25,22,.08); border: 0; border-radius: 999px; padding: 8px 14px; cursor: pointer; }
   header.open nav a.msignup { margin-top: 8px; text-align: center; font-weight: 700; background: #1C2420; color: #F5F3EC; border-radius: 999px; }
   header.open nav a.msignup:hover { background: #1C2420; }
 }
 @media (max-width: 980px) { body:has(header.open) .socialpin, body:has(header.open) .askbox { opacity: 0; pointer-events: none; } }
 
-/* desktop: Past clubs sits at the bottom of the More dropdown */
-header nav .d-only { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(20,25,22,.12); }
-header nav .d-only summary { list-style: none; padding: 9px 14px; border-radius: 9px; font-size: 14.5px; color: #1C2420; cursor: pointer; white-space: nowrap; }
-header nav .d-only summary::-webkit-details-marker { display: none; }
-header nav .d-only summary:hover { background: rgba(20,25,22,.08); }
-header nav .d-only summary::after { content: "▾"; font-size: 10px; margin-left: 6px; opacity: .7; display: inline-block; transition: transform .2s; }
-header nav .d-only[open] summary::after { transform: rotate(180deg); }
-header nav .d-only p { width: 240px; white-space: normal; margin: 2px 14px 10px; font-size: 13.5px; line-height: 1.5; color: #1C2420; opacity: .78; }
-header nav .d-only .suggest { margin: 0 14px 8px; font: 600 13px "Figtree", sans-serif; color: #1C2420; background: rgba(20,25,22,.08); border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; }
-header nav .d-only .suggest:hover { background: rgba(20,25,22,.14); }
-@media (max-width: 980px) { header nav .d-only { display: none !important; } }
-.pastclubs p.pastlist { font-weight: 600; opacity: 1; color: var(--grass, #3E7C4F); }
 
 @view-transition { navigation: auto; }
