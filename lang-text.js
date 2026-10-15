@@ -1250,5 +1250,14 @@ window.TMS_T = {
  "Chat on WhatsApp": [
   "WhatsAppで相談",
   "Escríbenos por WhatsApp"
- ]
+ ],
+ "Ask a quick question": ["ちょっと質問する", "Haz una pregunta rápida"],
+ "Quick question?": ["ちょっとした質問", "¿Una pregunta rápida?"],
+ "Leave your email and we’ll get back to you.": ["メールアドレスを残していただければ、折り返しご連絡します。", "Déjanos tu email y te responderemos."],
+ "Your email": ["メールアドレス", "Tu email"],
+ "Your question": ["ご質問", "Tu pregunta"],
+ "Please add a valid email and your question.": ["正しいメールアドレスとご質問を入力してください。", "Añade un email válido y tu pregunta."],
+ "Send": ["送信", "Enviar"],
+ "Thanks!": ["ありがとうございます！", "¡Gracias!"],
+ "We’ll reply by email soon. (This is a demo, so nothing was sent yet.)": ["近日中にメールでお返事します。（デモのため、まだ送信されていません。）", "Te responderemos pronto por email. (Es una demo, así que aún no se ha enviado nada.)"]
 };
