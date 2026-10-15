@@ -34,7 +34,10 @@
   }
   btn.addEventListener('click', function (e) { e.stopPropagation(); open(box.hidden); });
   box.querySelector('.x').addEventListener('click', function () { open(false); btn.focus(); });
-  document.addEventListener('click', function (e) { if (!box.hidden && !box.contains(e.target)) open(false); });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('a[href="#suggest"]')) { e.preventDefault(); open(true); return; }   // "Suggest a sport" on the home page
+    if (!box.hidden && !box.contains(e.target)) open(false);
+  });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) { open(false); btn.focus(); } });
   box.addEventListener('submit', function (e) {
     e.preventDefault();
