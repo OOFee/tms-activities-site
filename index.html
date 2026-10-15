@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Figtree:wght@400;500;600;700&family=Caveat:wght@600&display=block" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
+<script src="lite.js"></script>
 <style>
   :root {
     --night: #0E1A14;
@@ -106,6 +107,13 @@
     .heroChalk .rollx { animation: none; transform: translate(300px, 770px); }
     .heroChalk .speed { animation: none; transform: scaleX(.55); }
   }
+  /* weak devices (lite.js): same still versions */
+  html.lite .heroChalk .ht { animation: none !important; stroke-dashoffset: 0; opacity: .7; }
+  html.lite .heroChalk .ht.blip { opacity: 0; }
+  html.lite .heroChalk .roll { animation: none; transform: translate(300px, 770px) scale(1.6); }
+  html.lite .heroChalk .rollx { animation: none; transform: translate(300px, 770px); }
+  html.lite .heroChalk .speed { animation: none; transform: scaleX(.55); }
+
 
   /* activity cards - light sheet sliding over the fixed hero */
   .games {
@@ -239,6 +247,13 @@
     .toy { transition: opacity .2s ease !important; transform: rotate(var(--r)) !important; }
     .fx-chalk .bob, .fx-chalk .flame { animation: none !important; }
   }
+  /* weak devices (lite.js): same still versions */
+  html.lite .tile, html.lite .fx, html.lite .ph img.bg { transition: none; }
+  html.lite .tile { opacity: 1; transform: none; }
+  html.lite .fx-chalk .d, html.lite .fx-chalk .w { transition: none !important; }
+  html.lite .toy { transition: opacity .2s ease !important; transform: rotate(var(--r)) !important; }
+  html.lite .fx-chalk .bob, html.lite .fx-chalk .flame { animation: none !important; }
+
 </style>
 <script>
 (function(){try{
@@ -620,11 +635,11 @@
     }
   }, { threshold: 0.18 });
   document.querySelectorAll('.tile').forEach(t => io.observe(t));
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('.heroChalk').setCurrentTime(10);
+  if (window.TMS_LITE || matchMedia('(prefers-reduced-motion: reduce)').matches) document.querySelector('.heroChalk').setCurrentTime(10);
   /* hero chalk, after the intro: nudge a ball or the shuttle and it rolls / bounces / flies away; hold-click to drag and throw */
   (() => {
     const svg = document.querySelector('.heroChalk'), hero = document.querySelector('.hero');
-    if (!svg || !hero) return;   // knocking things about only happens when you do it, so it runs even with reduced motion
+    if (!svg || !hero || window.TMS_LITE) return;   // runs even with reduced motion (you start it), but not on weak devices
     const t0 = performance.now(), FLOOR = 840;
     const strip = (g) => g.querySelectorAll(':scope > set, :scope > animateMotion, :scope > g > animateTransform').forEach(a => a.remove());
     const shuttlePath = document.getElementById('hShuttle'), sp = shuttlePath.getTotalLength();

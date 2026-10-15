@@ -7,7 +7,7 @@
   if (!svg && box) { svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 1440 900'); svg.setAttribute('preserveAspectRatio', 'xMidYMax slice'); svg.setAttribute('aria-hidden', 'true'); box.append(svg); }
   if (!svg) return;
   const page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '').replace(/^index$|^$/, 'c');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.TMS_LITE || matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const css = `
     .world .scenery.chalked { opacity: .78; }
@@ -40,7 +40,10 @@
       .chalked .cd, .chalked .cf, .chalked .fade { animation: none; stroke-dashoffset: 0; opacity: 1; }
       .chalked .drift { animation: none; }
       .chalked .word { animation: none; opacity: 1; clip-path: none; }
-    }`;
+    }
+    html.lite .chalked .cd, html.lite .chalked .cf, html.lite .chalked .fade { animation: none; stroke-dashoffset: 0; opacity: 1; }
+    html.lite .chalked .drift { animation: none; }
+    html.lite .chalked .word { animation: none; opacity: 1; clip-path: none; }`;
   const style = document.createElement('style'); style.textContent = css; document.head.append(style);
 
   // helpers ------------------------------------------------------------------------------------

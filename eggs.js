@@ -3,7 +3,7 @@
 // outline that draws itself round the member-discount card. Runs after chalk-scenes.js has built the scenery.
 (() => {
   const page = (location.pathname.split('/').pop() || 'c.html').replace(/\.html$/, '');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = window.TMS_LITE || matchMedia('(prefers-reduced-motion: reduce)').matches;
   const NS = 'http://www.w3.org/2000/svg';
 
   const css = `
@@ -80,7 +80,7 @@
   const scenery = document.querySelector('.world .scenery svg');
 
   // swimming: pop the rising bubbles
-  if (page === 'swimming' && scenery) {
+  if (page === 'swimming' && scenery && !window.TMS_LITE) {
     scenery.querySelectorAll('circle').forEach(c => {
       if (!c.querySelector('animate[attributeName="cy"]')) return;
       c.classList.add('poppable');
@@ -94,7 +94,7 @@
   }
 
   // parties: pop the balloons
-  if (page === 'parties' && scenery) {
+  if (page === 'parties' && scenery && !window.TMS_LITE) {
     scenery.querySelectorAll('ellipse[rx="26"]').forEach(el => {
       const bal = el.closest('g[data-at]'); if (!bal) return;
       const move = bal.querySelector(':scope > animateTransform');
@@ -152,7 +152,7 @@
 
   // title toys ------------------------------------------------------------------------------------------------
   const title = document.querySelector('.world-copy h1');
-  if (!title || !['soccer', 'tennis', 'spanish', 'swimming', 'parties'].includes(page)) return;   // these only move when you ask, so they run even with reduced motion
+  if (!title || window.TMS_LITE || !['soccer', 'tennis', 'spanish', 'swimming', 'parties'].includes(page)) return;   // these only move when you ask, so they run even with reduced motion
   if (page !== 'parties') title.classList.add('egg-title');
   if (!reduce) setTimeout(() => {
     const el = page === 'parties' ? title.querySelector('.egg-word') : title;
