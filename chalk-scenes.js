@@ -113,7 +113,8 @@
           <g><animateTransform attributeName="transform" type="rotate" values="0;540;0" keyTimes="0;.5;1" ${loop(3.4)}/>
             <circle class="k" r="14"/><path class="k" style="stroke-width:2" d="M-9 -10 Q-3 0 -9 10 M9 -10 Q3 0 9 10"/></g>
         </g>`;
-      return `<g>${court}</g><g data-at="380,790">${net}${rally}</g>`;
+      // phones only have room under the photo for one of these, so the moving rally gets it and the still court sits out
+      return `<g data-phone="drop">${court}</g><g data-at="380,790" data-half="340"><g data-box="1">${net}${rally.replace('<g opacity="0">', '</g><g opacity="0">')}</g>`;
     },
 
     // bunting draws across the top and its flags drop in; handwritten Spanish words keep writing themselves
@@ -130,7 +131,7 @@
         ['¡vamos!', 400, 845, 58], ['sí', 1384, 250, 46], ['¿qué tal?', 560, 712, 42], ['hablar', 630, 430, 38, 1],
         ['amigos', 1220, 850, 50], ['me llamo…', 60, 705, 34], ['adiós', 1080, 800, 40], ['fútbol', 600, 575, 40, 1],
         ['¡olé!', 330, 740, 52], ['mañana', 720, 880, 36]];
-      s += words.map(([w, x, y, sz, faint], i) => `<text class="word${faint ? ' faint' : ''}" x="${x}" y="${y}" font-size="${sz}" style="--cyc:16s;--del:${(1.4 + i * 1.15).toFixed(2)}s">${w}</text>`).join('');
+      s += words.map(([w, x, y, sz, faint], i) => `<text class="word${faint ? ' faint' : ''}" data-word="${i}" x="${x}" y="${y}" font-size="${sz}" style="--cyc:16s;--del:${(1.4 + i * 1.15).toFixed(2)}s">${w}</text>`).join('');
       return s;
     },
 
@@ -247,7 +248,7 @@
   const pins = [...root.children].filter(el => el.dataset.pin !== 'none').map(el => {
     const w = document.createElementNS('http://www.w3.org/2000/svg', 'g'); el.before(w); w.append(el);
     const b = w.getBBox(), at = el.dataset.at ? el.dataset.at.split(',').map(Number) : [b.x + b.width / 2, b.y + b.height / 2];
-    return { w, at, half: el.dataset.at ? 0 : b.width / 2, fit: +el.dataset.fit || 0, full: b.width > 1000 };
+    return { w, el, at, half: el.dataset.at ? +el.dataset.half || 0 : b.width / 2, fit: +el.dataset.fit || 0, full: b.width > 1000 };
   });
   let cover = 0;
   const layout = () => {
@@ -271,8 +272,10 @@
     const solid = innerWidth <= 700 ? [...document.querySelectorAll('.world-copy > *, .world-photo img')].map(e => e.getBoundingClientRect()) : [];
     for (const p of pins) {
       p.w.style.display = '';
+      if (solid.length && p.el.dataset.phone === 'drop') { p.w.style.display = 'none'; continue; }
+      if (solid.length && p.el.dataset.word) continue;   // placed below
       if (!solid.length || p.fit || p.full) continue;
-      const r = p.w.getBoundingClientRect(), hit = solid.filter(o => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top);
+      const r = (p.el.querySelector(':scope > [data-box]') || p.w).getBoundingClientRect(), hit = solid.filter(o => r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top);
       if (!hit.length) continue;
       // bottom pieces slide down under the photo when there is room above the sheet; anything else is left out
       const down = Math.max(...hit.map(o => o.bottom)) + 8 - r.top, floor = svg.getBoundingClientRect().bottom - lift;
@@ -283,7 +286,42 @@
       } else p.w.style.display = 'none';
     }
   };
-  layout();
-  new ResizeObserver(layout).observe(svg);
+  // phones (Spanish): the handwritten words take turns in the free spaces up and down the hero, not just the strip at the foot
+  const spots = () => {
+    const q = (sel) => document.querySelector(sel), sr = svg.getBoundingClientRect(), out = [];
+    const h1 = q('.world-copy h1'), cta = q('.world-copy .cta'), photo = q('.world-photo img'), sheet = q('.sheet');
+    const W = innerWidth, floor = Math.min(sr.bottom, sheet ? sheet.getBoundingClientRect().top : sr.bottom);
+    const right = (el) => { if (!el) return; const r = el.getBoundingClientRect(); if (W - r.right > 90) out.push([r.right + 16, r.top + r.height * .62, W - r.right - 28]); };
+    if (h1) { const r = h1.getBoundingClientRect(), tw = (() => { const g = document.createRange(); g.selectNodeContents(h1); return g.getBoundingClientRect().right; })();
+      if (W - tw > 90) out.push([tw + 18, r.top + r.height * .55, W - tw - 30]); }
+    right(cta);
+    if (cta && photo) { const a = cta.getBoundingClientRect(), b = photo.getBoundingClientRect(); if (b.top - a.bottom > 34) out.push([W * .45, (a.bottom + b.top) / 2 + 10, W * .5]); }
+    if (photo) { const b = photo.getBoundingClientRect(), room = floor - b.bottom;
+      if (room > 40) { out.push([22, b.bottom + Math.min(room * .4, 48), W * .5]); out.push([W * .52, b.bottom + Math.min(room * .78, 100), W * .44]); } }
+    return out.map(([x, y, w]) => [x - sr.left, y - sr.top, w]);
+  };
+  const placeWords = () => {
+    const words = pins.filter(p => p.el.dataset.word);
+    if (!words.length || innerWidth > 700) return;
+    const vb = svg.viewBox.baseVal, s = svg.clientWidth / vb.width, list = spots();
+    if (!list.length) return;
+    // each word shows for ~3.5s of its 16s cycle; a spot only takes words that are never on screen at the same time
+    const busy = list.map(() => []), gap = (a, b) => { const d = Math.abs(a - b) % 16; return Math.min(d, 16 - d); };
+    words.forEach((p, i) => {
+      const del = parseFloat((p.el.getAttribute('style') || '').match(/--del:([\d.]+)/)?.[1] || 0);
+      let j = -1;
+      for (let k = 0; k < list.length; k++) { const c = (i + k) % list.length; if (busy[c].every(d => gap(d, del) > 3.8)) { j = c; break; } }
+      if (j < 0) { p.w.style.display = 'none'; return; }
+      busy[j].push(del);
+      const [sx, sy, room] = list[j], t = p.el, x = +t.getAttribute('x'), y = +t.getAttribute('y');
+      const wpx = t.getComputedTextLength() * s, k = Math.min(1.15, room / Math.max(1, wpx));   // fit the space it has
+      p.w.style.display = '';
+      p.w.setAttribute('transform', `translate(${(vb.x + sx / s).toFixed(1)} ${(vb.y + sy / s).toFixed(1)}) scale(${k.toFixed(3)}) translate(${-x} ${-y})`);
+    });
+  };
+  const relayout = () => { layout(); placeWords(); };
+  relayout();
+  new ResizeObserver(relayout).observe(svg);
+  addEventListener('load', relayout);   // the photo's real height is only known once it has loaded
   if (reduce) svg.pauseAnimations();
 })();
