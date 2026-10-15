@@ -1274,5 +1274,6 @@ window.TMS_T = {
  "D&amp;D": ["D&amp;D", "D&amp;D"],
  "Creative thinking": ["クリエイティブ思考", "Pensamiento creativo"],
  "We’d love the {club} club to come back!": ["{club}クラブをまた開いてほしいです！", "¡Nos encantaría que volviera el club de {club}!"],
- "Chess · Running · Board games · D&amp;D · Creative thinking": ["チェス · ランニング · ボードゲーム · D&amp;D · クリエイティブ思考", "Ajedrez · Running · Juegos de mesa · D&amp;D · Pensamiento creativo"]
+ "Chess · Running · Board games · D&amp;D · Creative thinking": ["チェス · ランニング · ボードゲーム · D&amp;D · クリエイティブ思考", "Ajedrez · Running · Juegos de mesa · D&amp;D · Pensamiento creativo"],
+ "<b>Just a quick question?</b> Skip the form and ask us here": ["<b>ちょっとした質問ですか？</b> フォームは飛ばして、こちらからどうぞ", "<b>¿Solo una pregunta rápida?</b> Sáltate el formulario y pregúntanos aquí"]
 };

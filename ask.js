@@ -39,7 +39,7 @@
   }
   btn.addEventListener('click', function (e) { e.stopPropagation(); open(!isOpen); });
   document.addEventListener('click', function (e) {
-    if (e.target.closest('a[href="#suggest"]')) { e.preventDefault(); open(true); return; }   // "Suggest a sport" on the home page
+    if (e.target.closest('a[href="#suggest"], a[href="#ask"]')) { e.preventDefault(); open(true); return; }   // "Suggest a sport" (home), "Just a quick question?" (join)
     if (isOpen && !box.contains(e.target)) open(false);
   });
   // other buttons can open the box with a club already named, e.g. "Past clubs" on the home page
