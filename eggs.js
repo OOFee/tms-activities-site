@@ -256,6 +256,7 @@
     const tick = (now) => {
       const dt = Math.min(.033, (now - (last || now)) / 1000); last = now;
       const floor = panelTop(), W = innerWidth, H = innerHeight;
+      sky.style.clipPath = `inset(0 0 ${Math.max(0, H - floor).toFixed(0)}px 0)`;   // nothing shows over the panel
       for (let i = live.length - 1; i >= 0; i--) {
         const b = live[i];
         b.vy += 1500 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.vx * dt / b.r;
@@ -364,44 +365,51 @@
     });
   }
 
-  // spanish: it rains little Spanish flags; they land on the panel, settle, then fade
+  // spanish: it rains little Spanish flags; they land on the panel, tip over, then fade. All drawn on one canvas
+  // (cheap even with a hundred of them), and nothing is ever drawn below the panel's top edge
   if (page === 'spanish') {
-    const live = [];
+    const cv = document.createElement('canvas'), cx = cv.getContext('2d'), live = [];
+    cv.style.cssText = 'width:100vw;height:100vh';
     let raf = 0, last = 0;
+    const flag = (f) => {   // drawn with the foot of the pole at the origin
+      const w = f.w, ch = w * 2 / 3, h = ch * 1.7, sk = f.landed ? 0 : Math.sin(f.t * f.fl) * .12;
+      cx.strokeStyle = '#6b5a3a'; cx.lineWidth = 1.6; cx.beginPath(); cx.moveTo(0, 0); cx.lineTo(0, -h); cx.stroke();
+      cx.save(); cx.translate(1, -h); cx.transform(1, sk, 0, 1, 0, 0);
+      cx.fillStyle = '#AA151B'; cx.fillRect(0, 0, w, ch);
+      cx.fillStyle = '#F1BF00'; cx.fillRect(0, ch / 4, w, ch / 2);
+      cx.restore();
+    };
     const tick = (now) => {
       const dt = Math.min(.033, (now - (last || now)) / 1000); last = now;
-      const floor = panelTop(), H = innerHeight;
+      const dpr = devicePixelRatio || 1, W = innerWidth, H = innerHeight, floor = Math.min(H, panelTop());
+      if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+      cx.save(); cx.beginPath(); cx.rect(0, 0, W, Math.max(0, floor)); cx.clip();
       for (let i = live.length - 1; i >= 0; i--) {
         const f = live[i]; f.t += dt;
         if (f.t < 0) continue;
         if (!f.landed) {
-          f.vy = Math.min(f.vy + 300 * dt, f.max); f.y += f.vy * dt; f.x += (Math.sin(f.t * f.sw) * f.dr) * dt; f.a += f.va * dt;
-          if (floor < H + 40 && f.y + f.h > floor && f.y + f.h < floor + 60) { f.landed = f.t; f.y = floor - f.h; f.a0 = f.a; f.el.firstChild.pauseAnimations(); /* stops fluttering once it's down */ f.lie = -(66 + Math.random() * 18); }   // tips over pole-first, so the cloth ends up on top
+          f.vy = Math.min(f.vy + 300 * dt, f.max); f.y += f.vy * dt; f.x += Math.sin(f.t * f.sw) * f.dr * dt; f.a += f.va * dt;
+          if (f.y >= floor && floor < H) { f.landed = f.t; f.y = floor; f.a0 = f.a; f.lie = -(66 + Math.random() * 18); }   // pole-first, cloth on top
         } else {
           const u = Math.min(1, (f.t - f.landed) / .35);
-          f.a = f.a0 + (f.lie - f.a0) * (1 - Math.pow(1 - u, 3));   // tips over onto the panel
-          f.el.style.opacity = Math.max(0, 1 - Math.max(0, f.t - f.landed - 1.4) / .6);
+          f.a = f.a0 + (f.lie - f.a0) * (1 - Math.pow(1 - u, 3)); f.y = floor;
         }
-        f.el.style.transform = `translate(${f.x}px, ${f.y}px) rotate(${f.a}deg)`;
-        if (!f.shown) { f.el.style.visibility = 'visible'; f.shown = true; }
-        if (f.y > H + 60 || (f.landed && f.t - f.landed > 2)) { f.el.remove(); live.splice(i, 1); }
+        const alpha = f.landed ? 1 - Math.max(0, f.t - f.landed - 1.4) / .6 : 1;
+        if (alpha <= 0 || f.y > H + 80) { live.splice(i, 1); continue; }
+        cx.save(); cx.globalAlpha = alpha; cx.translate(f.x, f.y); cx.rotate(f.a * Math.PI / 180); flag(f); cx.restore();
       }
-      raf = live.length ? requestAnimationFrame(tick) : 0;
+      cx.restore();
+      raf = live.length ? requestAnimationFrame(tick) : (cx.clearRect(0, 0, W, H), 0);
     };
-    const flag = (delay) => {
-      if (live.length > 220) return;
-      const w = 26 + Math.random() * 22, h = w * 2 / 3, el = document.createElement('div');
-      el.style.visibility = 'hidden'; el.style.transformOrigin = '2px 100%';
-      el.innerHTML = `<svg width="${w}" height="${h + 14}" viewBox="0 -2 30 34" style="display:block;overflow:visible">
-        <path d="M1 -2 V32" stroke="#6b5a3a" stroke-width="1.6" stroke-linecap="round"/>
-        <g><rect x="1.5" y="0" width="28" height="5" fill="#AA151B"/><rect x="1.5" y="5" width="28" height="10" fill="#F1BF00"/><rect x="1.5" y="15" width="28" height="5" fill="#AA151B"/>
-        <animateTransform attributeName="transform" type="skewY" values="0;-6;0;5;0" dur="${(.8 + Math.random() * .6).toFixed(2)}s" repeatCount="indefinite"/></g></svg>`;
-      skyLayer().append(el);
-      live.push({ el, x: Math.random() * innerWidth, y: -70, h: h + 14, vy: 60 + Math.random() * 60, max: 180 + Math.random() * 160,
-        sw: 1.5 + Math.random() * 2, dr: 40 + Math.random() * 70, a: (Math.random() - .5) * 30, va: (Math.random() - .5) * 60, t: -delay / 1000 });
+    title.addEventListener('click', () => {
+      if (!cv.isConnected) skyLayer().append(cv);
+      for (let i = 0; i < 45 && live.length < 120; i++) {
+        const w = 26 + Math.random() * 22;
+        live.push({ w, x: Math.random() * innerWidth, y: -10, vy: 60 + Math.random() * 60, max: 180 + Math.random() * 160, fl: 6 + Math.random() * 5,
+          sw: 1.5 + Math.random() * 2, dr: 40 + Math.random() * 70, a: (Math.random() - .5) * 30, va: (Math.random() - .5) * 60, t: -(i * .055 + Math.random() * .4) });
+      }
       if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
-    };
-    title.addEventListener('click', () => { for (let i = 0; i < 45; i++) flag(i * 55 + Math.random() * 400); });
+    });
   }
-
 })();
