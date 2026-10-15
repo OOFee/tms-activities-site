@@ -6,7 +6,7 @@
 <title>C · Floodlights · TMS Activities</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Figtree:wght@400;500;600;700&family=Caveat:wght@600&display=block" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=c9cedaaf">
+<link rel="stylesheet" href="site.css?v=d0392d99">
 <script src="lite.js?v=ae5314a7"></script>
 <script>try{if((localStorage.getItem("lang")||"en")!=="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},2000)}}catch(e){}</script>
 <style>
@@ -213,6 +213,37 @@
   .tile.next .inner { position: relative; z-index: 1; border-radius: 18px; transition: background .45s ease; }
   .tile.next:hover .inner, .tile.next:focus-within .inner { background: radial-gradient(closest-side, rgba(245,243,236,.95) 60%, rgba(245,243,236,0)); }
   .tile.next:focus-within h3 { color: var(--grass); }
+  /* the card flips over to show past clubs */
+  .tile.next .inner { display: grid; perspective: 1400px; }
+  .tile.next .face { grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    transition: transform .7s cubic-bezier(.45,.05,.25,1), visibility 0s .35s; }
+  .tile.next .back { transform: rotateY(-180deg); visibility: hidden; }
+  .tile.next.flipped .front { transform: rotateY(180deg); visibility: hidden; }
+  .tile.next.flipped .back { transform: rotateY(0); visibility: visible; }
+  .tile.next.flipped { border-color: var(--grass); }
+  .tile.next.flipped .toy { opacity: 0 !important; transition: opacity .2s ease !important; }
+  .tile.next.flipped h3 { color: var(--grass); }
+  .tile.next .flip { margin-top: 14px; font: 600 14px "Figtree", sans-serif; color: #6b746d; background: none; border: 0; padding: 4px 2px; cursor: pointer;
+    text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 4px; }
+  .tile.next .flip:hover { color: var(--grass); }
+  .tile.next .front .flip::after { content: " →"; }
+  .tile.next .back .flip::before { content: "← "; }
+  .tile.next .back p { max-width: 34ch; font-size: 14.5px; line-height: 1.5; color: #5d665f; }
+  .tile.next .back p.hint { margin-top: 8px; font-size: 12.5px; color: #8a938b; }
+  .clubs { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 330px; }
+  .clubs .club { display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px 6px 8px; border-radius: 999px;
+    border: 1.5px solid rgba(62,124,79,.35); background: #fff; color: #1C2420; font: 600 13.5px "Figtree", sans-serif; cursor: pointer;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+  .clubs .club:hover { transform: translateY(-2px) rotate(-1.5deg); border-color: var(--grass); background: #f6faf6; }
+  .clubs .club svg { width: 24px; height: 24px; fill: none; stroke: var(--grass); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+  .tile.next.flipped .back .club { animation: clubIn .45s cubic-bezier(.34,1.4,.6,1) both; }
+  .tile.next.flipped .back li:nth-child(1) .club { animation-delay: .35s; }
+  .tile.next.flipped .back li:nth-child(2) .club { animation-delay: .41s; }
+  .tile.next.flipped .back li:nth-child(3) .club { animation-delay: .47s; }
+  .tile.next.flipped .back li:nth-child(4) .club { animation-delay: .53s; }
+  .tile.next.flipped .back li:nth-child(5) .club { animation-delay: .59s; }
+  @keyframes clubIn { from { opacity: 0; transform: translateY(10px) scale(.9); } }
   .pile { position: absolute; inset: 0; pointer-events: none; }
   .toy {
     position: absolute; width: 58px; height: 58px; margin-left: -6px;
@@ -296,13 +327,13 @@
 <header>
   <span class="word">TMS Activities</span>
   <nav>
-    <a href="soccer.html">Soccer</a><a href="swimming.html">Swimming</a><a href="tennis.html">Tennis</a><a href="spanish.html">Spanish</a><a href="parties.html">Parties</a><details class="pastclubs m-only"><summary>Past clubs</summary><p>We sometimes run shorter clubs on request and open them to everyone. Happy to run one again if there’s interest, or if your child wants to try something new, tell us!</p><button type="button" class="suggest">Suggest a club</button></details><hr class="m-only"><div class="navgroup" tabindex="0">
+    <a href="soccer.html">Soccer</a><a href="swimming.html">Swimming</a><a href="tennis.html">Tennis</a><a href="spanish.html">Spanish</a><a href="parties.html">Parties</a><details class="pastclubs m-only"><summary>Past clubs</summary><p>Every so often we run a shorter club, usually because a family asked, and open it to everyone. If your kids miss one, or have something new they’d love to try, let us know.</p><p class="pastlist">Chess · Running · Board games · D&amp;D · Creative thinking</p><button type="button" class="suggest">Suggest a club</button></details><hr class="m-only"><div class="navgroup" tabindex="0">
       <button class="glabel" type="button">More</button>
       <div class="menu"><div>
         <a href="about.html">About us</a>
         <a href="coaches.html">Coaches</a>
         <a href="supporters.html">Supporters</a>
-        <a href="faq.html">FAQ</a><details class="pastclubs d-only"><summary>Past clubs</summary><p>We sometimes run shorter clubs on request and open them to everyone. Happy to run one again if there’s interest, or if your child wants to try something new, tell us!</p><button type="button" class="suggest">Suggest a club</button></details>
+        <a href="faq.html">FAQ</a><details class="pastclubs d-only"><summary>Past clubs</summary><p>Every so often we run a shorter club, usually because a family asked, and open it to everyone. If your kids miss one, or have something new they’d love to try, let us know.</p><p class="pastlist">Chess · Running · Board games · D&amp;D · Creative thinking</p><button type="button" class="suggest">Suggest a club</button></details>
       </div></div>
     </div>
   <a class="msignup m-only" href="join.html">Sign up</a></nav>
@@ -567,9 +598,19 @@
         <svg class="toy" style="left:81.8%;bottom:86.3%;--r:-5deg;--d:0.75s" viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><circle cx="32" cy="32" r="26"/><path d="M15 13 Q26 32 15 51 M49 13 Q38 32 49 51 M17 20 l5 -2 M20 28 l5 -1 M20 36 l5 1 M17 44 l5 2 M47 20 l-5 -2 M44 28 l-5 -1 M44 36 l-5 1 M47 44 l-5 2"/></g></svg>
       </div>
       <div class="inner">
-        <h3>Coming next…</h3>
-        <p>New programmes join the club every season. Tell us what your kids want to play.</p>
-        <a class="suggest" href="#suggest">Suggest a sport</a>
+        <div class="face front">
+          <h3>Coming next…</h3>
+          <p>New programmes join the club every season. Tell us what your kids want to play.</p>
+          <a class="suggest" href="#suggest">Suggest a sport</a>
+          <button type="button" class="flip">See our past clubs</button>
+        </div>
+        <div class="face back">
+          <h3>Past clubs</h3>
+          <p>Every so often we run a shorter club, usually because a family asked, and open it to everyone. If your kids miss one, or have something new they’d love to try, let us know.</p>
+          <ul class="clubs"><li><button type="button" class="club" data-club="Chess"><svg viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M18 56 H46 M22 56 L24 46 H40 L42 56 M24 46 Q18 38 22 30 L32 20 L30 10 L38 14 Q50 22 46 36 L40 46"/><circle cx="36" cy="22" r="1.6"/></g></svg><span>Chess</span></button></li><li><button type="button" class="club" data-club="Running"><svg viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M8 42 Q9 32 17 31 L26 25 Q30 34 42 35 L53 38 Q58 40 57 46 H10 Q8 46 8 42 Z M10 46 V50 H57 V46 M30 30 l3 -3 M34 32 l3 -3"/></g></svg><span>Running</span></button></li><li><button type="button" class="club" data-club="Board games"><svg viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><rect x="12" y="12" width="40" height="40" rx="8"/><circle cx="22" cy="22" r="2.5"/><circle cx="32" cy="32" r="2.5"/><circle cx="42" cy="42" r="2.5"/><circle cx="42" cy="22" r="2.5"/><circle cx="22" cy="42" r="2.5"/></g></svg><span>Board games</span></button></li><li><button type="button" class="club" data-club="D&amp;D"><svg viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M32 5 L55 18 V46 L32 59 L9 46 V18 Z M32 5 L20 38 H44 Z M9 18 L20 38 M55 18 L44 38 M20 38 L32 59 L44 38 M9 46 L20 38 M55 46 L44 38"/></g></svg><span>D&amp;D</span></button></li><li><button type="button" class="club" data-club="Creative thinking"><svg viewBox="0 0 64 64" aria-hidden="true"><g filter="url(#chalk)"><path d="M24 41 Q14 34 16 23 Q19 10 32 10 Q45 10 48 23 Q50 34 40 41 V47 H24 Z M26 53 H38 M28 58 H36 M32 3 V0 M10 10 l-3 -3 M54 10 l3 -3 M4 26 H0 M60 26 h4"/></g></svg><span>Creative thinking</span></button></li></ul>
+          <p class="hint">Tap one to ask for it back</p>
+          <button type="button" class="flip">Back</button>
+        </div>
       </div>
     </div>
 
@@ -868,8 +909,22 @@
 </script>
 
 <div class="socialpin"><a class="wa" href="https://wa.me/818089162274" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M9.2 7.6c.3-.1.6 0 .7.3l.7 1.6c.1.3 0 .5-.2.7l-.5.6c.6 1.2 1.6 2.2 2.9 2.9l.6-.5c.2-.2.5-.2.7-.1l1.6.7c.3.1.4.4.3.7-.3 1-1.2 1.6-2.2 1.4-2.6-.5-4.7-2.6-5.3-5.2-.2-1 .4-1.9 1.4-2.2z" fill="currentColor"/></svg></a><a class="ig" href="https://www.instagram.com/spainup.soccer.academy/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a></div>
-<script src="ask.js?v=92240fd5"></script>
-<script src="lang-text.js?v=c4b8a063"></script>
+<script>
+// Coming next card: flip to past clubs; tapping a club opens the quick question box asking for it back
+(() => {
+  const card = document.querySelector('.tile.next');
+  if (!card) return;
+  card.querySelectorAll('.flip').forEach((b) => b.addEventListener('click', () => {
+    const on = card.classList.toggle('flipped');
+    setTimeout(() => card.querySelector(on ? '.back .club' : '.front .flip').focus({ preventScroll: true }), 380);
+  }));
+  card.querySelectorAll('.club').forEach((b) => b.addEventListener('click', () => {
+    if (window.TMSAsk) window.TMSAsk(b.textContent.trim());
+  }));
+})();
+</script>
+<script src="ask.js?v=56c63005"></script>
+<script src="lang-text.js?v=d2091e63"></script>
 <script src="lang.js?v=e1dfec5e"></script>
 <script src="transitions.js?v=628495eb" defer></script>
 </body>

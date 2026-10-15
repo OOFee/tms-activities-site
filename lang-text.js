@@ -1263,5 +1263,16 @@ window.TMS_T = {
  "Past clubs": ["過去のクラブ", "Clubs anteriores"],
  "We sometimes run shorter clubs on request and open them to everyone. Happy to run one again if there’s interest, or if your child wants to try something new, tell us!": ["ご要望に応じて短期クラブを開き、どなたでも参加できるようにしています。また開いてほしいクラブや、お子さまが挑戦してみたいことがあれば、ぜひ教えてください！", "A veces organizamos clubs cortos a petición y los abrimos a todos. Si hay interés, encantados de repetir uno, y si tu hijo quiere probar algo nuevo, ¡cuéntanoslo!"],
  "Suggest a club": ["クラブを提案する", "Propón un club"],
- "Sign up": ["申し込む", "Inscríbete"]
+ "Sign up": ["申し込む", "Inscríbete"],
+ "See our past clubs": ["過去のクラブを見る", "Ver clubs anteriores"],
+ "Every so often we run a shorter club, usually because a family asked, and open it to everyone. If your kids miss one, or have something new they’d love to try, let us know.": ["ご家族からのリクエストをきっかけに、どなたでも参加できる短期クラブを開くことがあります。また参加したいクラブや、お子さまが挑戦してみたいことがあれば、ぜひ教えてください。", "De vez en cuando organizamos un club más corto, normalmente porque una familia lo pidió, y lo abrimos a todos. Si tus hijos echan de menos alguno, o quieren probar algo nuevo, cuéntanoslo."],
+ "Tap one to ask for it back": ["タップしてまた開いてほしいと伝える", "Toca uno para pedir que vuelva"],
+ "Back": ["戻る", "Volver"],
+ "Chess": ["チェス", "Ajedrez"],
+ "Running": ["ランニング", "Running"],
+ "Board games": ["ボードゲーム", "Juegos de mesa"],
+ "D&amp;D": ["D&amp;D", "D&amp;D"],
+ "Creative thinking": ["クリエイティブ思考", "Pensamiento creativo"],
+ "We’d love the {club} club to come back!": ["{club}クラブをまた開いてほしいです！", "¡Nos encantaría que volviera el club de {club}!"],
+ "Chess · Running · Board games · D&amp;D · Creative thinking": ["チェス · ランニング · ボードゲーム · D&amp;D · クリエイティブ思考", "Ajedrez · Running · Juegos de mesa · D&amp;D · Pensamiento creativo"]
 };

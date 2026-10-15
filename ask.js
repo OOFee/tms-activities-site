@@ -38,6 +38,13 @@
     if (e.target.closest('a[href="#suggest"]')) { e.preventDefault(); open(true); return; }   // "Suggest a sport" on the home page
     if (!box.hidden && !box.contains(e.target)) open(false);
   });
+  // other buttons can open the box with a club already named, e.g. "Past clubs" on the home page
+  window.TMSAsk = function (club) {
+    var T = window.TMS_T || {}, l = document.documentElement.lang, en = 'We’d love the {club} club to come back!';
+    var line = (l !== 'en' && T[en] ? T[en][l === 'ja' ? 0 : 1] : en).replace('{club}', club);
+    if (club && !msg.value.trim()) msg.value = line;
+    setTimeout(function () { open(true); }, 0);
+  };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !box.hidden) { open(false); btn.focus(); } });
   box.addEventListener('submit', function (e) {
     e.preventDefault();
