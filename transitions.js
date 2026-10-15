@@ -208,12 +208,11 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
     e.preventDefault(); e.stopPropagation(); close();
   }, true);
   // "Suggest a club" in Past clubs opens the quick-question box
-  const suggest = header.querySelector('.pastclubs .suggest');
   const ask = document.querySelector('.socialpin .ask');
-  if (suggest && ask) suggest.addEventListener('click', () => {
-    close();
+  if (ask) header.querySelectorAll('.pastclubs .suggest').forEach((b) => b.addEventListener('click', () => {
+    close(); if (document.activeElement) document.activeElement.blur();
     setTimeout(() => { ask.click(); const t = document.querySelector('.askbox textarea'); if (t) t.focus(); }, 0);
-  });
+  }));
 })();
 
 // touch screens: tiles play their hover animation as they scroll into view
