@@ -415,4 +415,20 @@ html[lang="es"] .chip.fit span::after { content: "Ideal"; }
 }
 @media print { .askbox { display: none; } }
 
+/* mobile menu extras: past clubs, divider after the activities, sign-up button */
+header nav .m-only { display: none; }
+@media (max-width: 980px) {
+  header.open nav .m-only { display: block; }
+  header.open nav hr { height: 1px; border: 0; background: rgba(20,25,22,.14); margin: 6px 12px; }
+  .pastclubs summary { list-style: none; padding: 12px 16px; font: 400 16px "Figtree", sans-serif; color: #1C2420; opacity: .7; cursor: pointer; border-radius: 10px; }
+  .pastclubs summary::-webkit-details-marker { display: none; }
+  .pastclubs summary::after { content: "▾"; font-size: 11px; margin-left: 7px; display: inline-block; transition: transform .2s; }
+  .pastclubs[open] summary::after { transform: rotate(180deg); }
+  .pastclubs p { white-space: normal; margin: 0 16px 10px; font-size: 14px; line-height: 1.5; color: #1C2420; opacity: .78; }
+  .pastclubs .suggest { margin: 0 16px 10px; font: 600 13.5px "Figtree", sans-serif; color: #1C2420; background: rgba(20,25,22,.08); border: 0; border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  header.open nav a.msignup { margin-top: 8px; text-align: center; font-weight: 700; background: #1C2420; color: #F5F3EC; border-radius: 999px; }
+  header.open nav a.msignup:hover { background: #1C2420; }
+}
+@media (max-width: 980px) { body:has(header.open) .socialpin, body:has(header.open) .askbox { opacity: 0; pointer-events: none; } }
+
 @view-transition { navigation: auto; }

@@ -1259,5 +1259,9 @@ window.TMS_T = {
  "Please add a valid email and your question.": ["正しいメールアドレスとご質問を入力してください。", "Añade un email válido y tu pregunta."],
  "Send": ["送信", "Enviar"],
  "Thanks!": ["ありがとうございます！", "¡Gracias!"],
- "We’ll reply by email soon. (This is a demo, so nothing was sent yet.)": ["近日中にメールでお返事します。（デモのため、まだ送信されていません。）", "Te responderemos pronto por email. (Es una demo, así que aún no se ha enviado nada.)"]
+ "We’ll reply by email soon. (This is a demo, so nothing was sent yet.)": ["近日中にメールでお返事します。（デモのため、まだ送信されていません。）", "Te responderemos pronto por email. (Es una demo, así que aún no se ha enviado nada.)"],
+ "Past clubs": ["過去のクラブ", "Clubs anteriores"],
+ "We sometimes run shorter clubs on request and open them to everyone. Happy to run one again if there’s interest, or if your child wants to try something new, tell us!": ["ご要望に応じて短期クラブを開き、どなたでも参加できるようにしています。また開いてほしいクラブや、お子さまが挑戦してみたいことがあれば、ぜひ教えてください！", "A veces organizamos clubs cortos a petición y los abrimos a todos. Si hay interés, encantados de repetir uno, y si tu hijo quiere probar algo nuevo, ¡cuéntanoslo!"],
+ "Suggest a club": ["クラブを提案する", "Propón un club"],
+ "Sign up": ["申し込む", "Inscríbete"]
 };

@@ -198,8 +198,21 @@ const NP = (s) => '/' + ((String(s).split('/').pop() || 'c.html').replace(/^inde
     btn.textContent = open ? 'Close' : 'Menu';
     btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
   });
+  const close = () => { header.classList.remove('open'); btn.textContent = 'Menu'; btn.setAttribute('aria-label', 'Open menu'); };
   header.addEventListener('click', (e) => {
-    if (e.target.closest('nav a')) { header.classList.remove('open'); btn.textContent = 'Menu'; }
+    if (e.target.closest('nav a')) close();
+  });
+  // tapping anywhere outside the open menu just closes it (and doesn't also press whatever was underneath)
+  document.addEventListener('click', (e) => {
+    if (!header.classList.contains('open') || header.contains(e.target)) return;
+    e.preventDefault(); e.stopPropagation(); close();
+  }, true);
+  // "Suggest a club" in Past clubs opens the quick-question box
+  const suggest = header.querySelector('.pastclubs .suggest');
+  const ask = document.querySelector('.socialpin .ask');
+  if (suggest && ask) suggest.addEventListener('click', () => {
+    close();
+    setTimeout(() => { ask.click(); const t = document.querySelector('.askbox textarea'); if (t) t.focus(); }, 0);
   });
 })();
 
